@@ -27,7 +27,7 @@ export async function generateSpeech(text, voiceConfig = {}) {
             exaggeration: voiceConfig.exaggeration || 0.5,
             cfg_weight: voiceConfig.cfg_weight || 0.5,
             speed_factor: voiceConfig.speed || 1.0,
-            seed: voiceConfig.seed || -1
+            seed: voiceConfig.seed || Math.floor(Math.random() * 4294967295)
         };
         
         // Make request to Chatterbox TTS server
@@ -132,11 +132,11 @@ export async function generateSpeechWithFallback(text, voiceConfig = {}) {
     } catch (error) {
         console.warn(`[TTS] Primary TTS failed, attempting fallback`);
         
-        // Fallback 1: Try with default voice
+        // Fallback 1: Try with wizard voice as default fallback
         try {
             const fallbackConfig = {
                 ...voiceConfig,
-                voice_id: 'default',
+                voice_id: 'wizard.wav',
             };
             return await generateSpeech(text, fallbackConfig);
             
