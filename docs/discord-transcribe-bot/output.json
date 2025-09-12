@@ -1,0 +1,375 @@
+{
+  "campaigns": [
+    {
+      "_id": "67f8384b17ba3a293fdf36c9",
+      "guildId": "519344197074026526",
+      "name": "The Curse of the Crimson Crown",
+      "dmUserId": "125661528547524608",
+      "createdAt": "2025-04-10T21:29:47.023Z",
+      "updatedAt": "2025-04-10T21:29:47.023Z"
+    }
+  ],
+  "summaries": [
+    {
+      "_id": "67f8384b17ba3a293fdf36cd",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 1,
+      "sessionStart": "2025-04-10T20:29:45.603Z",
+      "sessionEnd": "2025-04-10T21:29:47.163Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384b17ba3a293fdf36ce"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36cf"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36d0"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:47.166Z",
+      "encryptedSummary": {
+        "iv": "TFbs2v+qXAJhy0cfZA9YPA==",
+        "authTag": "GAsP+5hrtlhCmSP7Y8jQ2w==",
+        "encryptedData": "d2mNr8qA5OCuQvKgZpStHfrDhE4f+5V2EyKLHjJ/8ow5e5TGg6j1qEZYnnKQazXPLGOnUt8NZVo4LmNoa+gQ4RRyot4jdW2zboBe..."
+      }
+    },
+    {
+      "_id": "67f8384b17ba3a293fdf36da",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 2,
+      "sessionStart": "2025-04-10T20:29:47.230Z",
+      "sessionEnd": "2025-04-10T21:29:47.382Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384b17ba3a293fdf36db"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36dc"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36dd"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:47.383Z",
+      "encryptedSummary": {
+        "iv": "4s8VAcoE7NiN9UTP3e1GKw==",
+        "authTag": "3Cwy0mT05VXTXvxveL0JDw==",
+        "encryptedData": "6e9OGZKyXdHgQvP0nBT4NoYE7lyoiCzPYAPXKSFOPNy+6f1tLd5mu4rBcYw+t2RBk1i26nRZLdD28Hw7gtH25uEx9paWL+tqEZqT..."
+      }
+    },
+    {
+      "_id": "67f8384b17ba3a293fdf36e4",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 3,
+      "sessionStart": "2025-04-10T20:29:47.453Z",
+      "sessionEnd": "2025-04-10T21:29:47.613Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384b17ba3a293fdf36e5"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36e6"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36e7"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:47.614Z",
+      "encryptedSummary": {
+        "iv": "XYgyaUxuDVjzhTuTq2o65Q==",
+        "authTag": "JQB6PzPlKNoaRFHnMbivMw==",
+        "encryptedData": "tliuXNPqcqM7yK+HFtku6cftVeaBu8btTUO3CMijBmlb7bY9Yr2Pdc3uU3PpCVfEBb++VpM2udHyR6E5OfOGAvTS/5Zf3960jqLW..."
+      }
+    },
+    {
+      "_id": "67f8384b17ba3a293fdf36ee",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 4,
+      "sessionStart": "2025-04-10T20:29:47.657Z",
+      "sessionEnd": "2025-04-10T21:29:47.807Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384b17ba3a293fdf36ef"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36f0"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384b17ba3a293fdf36f1"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:47.807Z",
+      "encryptedSummary": {
+        "iv": "z5iWu4j2taYu8pb5xJP8lg==",
+        "authTag": "gvIB/InU6aUW360Y/X0Rtg==",
+        "encryptedData": "vc3zXwU2vHYNCHsaFh8HZJFnbFNkGO48Qxv/Hk/zPh36UTViBFKqBPo9l32vh/4Zs45Wu4OX0ht4SkjOcbf89BtIHLpMMU7vZbBR..."
+      }
+    },
+    {
+      "_id": "67f8384c17ba3a293fdf36fd",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 5,
+      "sessionStart": "2025-04-10T20:29:47.884Z",
+      "sessionEnd": "2025-04-10T21:29:48.033Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384c17ba3a293fdf36fe"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf36ff"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf3700"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:48.033Z",
+      "encryptedSummary": {
+        "iv": "TdT8jj0AecoONyPh90ZnGQ==",
+        "authTag": "PhDpgZd6QN0YQAQVkNDO6w==",
+        "encryptedData": "fRPuzgboD2GjckADN2aFFHEn09rxRFXVec8SLvGAzvqpDUpw9mQkdU85/yoO5DXVJDBehBYRGk098zUwBDSZ/inAovWRfbTLZ8s3..."
+      }
+    },
+    {
+      "_id": "67f8384c17ba3a293fdf3707",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 6,
+      "sessionStart": "2025-04-10T20:29:48.076Z",
+      "sessionEnd": "2025-04-10T21:29:48.233Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384c17ba3a293fdf3708"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf3709"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf370a"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:48.233Z",
+      "encryptedSummary": {
+        "iv": "wqTsXp7cZblNV48Mcg8zIA==",
+        "authTag": "Do2zTNcVn1bJHwKoIaPtBQ==",
+        "encryptedData": "JnFg9eA1vJh6x5jo80YleFcNEZoOGoaNORBbvkzNFQ5RD2dyHeqA5ED5gklJxfMa9sKSXrPWZpD9HOCDaefCHOYE1ExhCD1Vhs5H..."
+      }
+    },
+    {
+      "_id": "67f8384c17ba3a293fdf3711",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 7,
+      "sessionStart": "2025-04-10T20:29:48.276Z",
+      "sessionEnd": "2025-04-10T21:29:48.439Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384c17ba3a293fdf3712"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf3713"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf3714"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:48.439Z",
+      "encryptedSummary": {
+        "iv": "znyVM8JDR5qnSwqxvICrSA==",
+        "authTag": "oAIiivzvfF1FEy0BF1MH9g==",
+        "encryptedData": "culOK/fdb0dvsMEwqBFoZoDizdvtxla/6pvPrP846VsFJr498GpJaagjPWiJn1OSEa5aj+rB2+W5+9rJ7MVCi5864QpU0lBNK5N5..."
+      }
+    },
+    {
+      "_id": "67f8384c17ba3a293fdf371c",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 8,
+      "sessionStart": "2025-04-10T20:29:48.481Z",
+      "sessionEnd": "2025-04-10T21:29:48.633Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384c17ba3a293fdf371d"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf371e"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf371f"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:48.634Z",
+      "encryptedSummary": {
+        "iv": "eexNjU+3dTOJ50yOEKOsOA==",
+        "authTag": "Fcz3Gj8HXEmZvfdqCOJ/DA==",
+        "encryptedData": "q0t/BmSVXVAqpsS/jXPlvJFF8H0nPbYfEdj5pIs2KKs5HyqAouXMNAYz/fvPV3Dau3XwWjIJ28uPdtBA+LnN6OF8WiC/WQuDGaAO..."
+      }
+    },
+    {
+      "_id": "67f8384c17ba3a293fdf372c",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": null,
+      "sessionNumber": 9,
+      "sessionStart": "2025-04-10T20:29:48.742Z",
+      "sessionEnd": "2025-04-10T21:29:48.933Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384c17ba3a293fdf372d"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf372e"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384c17ba3a293fdf372f"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:48.933Z",
+      "encryptedSummary": {
+        "iv": "D6he5wB6LD6r/obo/ACEXw==",
+        "authTag": "R3iC8Jg845J89JLhU5EPOQ==",
+        "encryptedData": "qlC7hh6oXsGzB7WynO9he6jwqo5MqnsH6OfA4xfPlFJYfXlpKD/jq8mz3wqwj43aSyK3ZywyueW0hWMa0LsVscyhYc7Q3epeqb4g..."
+      }
+    },
+    {
+      "_id": "67f8384d17ba3a293fdf373c",
+      "guildId": "519344197074026526",
+      "campaignId": "67f8384b17ba3a293fdf36c9",
+      "sessionId": "67f8384d17ba3a293fdf3737",
+      "sessionNumber": 10,
+      "sessionStart": "2025-04-10T20:29:49.082Z",
+      "sessionEnd": "2025-04-10T21:29:49.234Z",
+      "participants": [
+        {
+          "userId": "125661528547524608",
+          "username": "Ozzy",
+          "isDM": true,
+          "_id": "67f8384d17ba3a293fdf373d"
+        },
+        {
+          "userId": "user2",
+          "username": "Illmuri",
+          "isDM": false,
+          "_id": "67f8384d17ba3a293fdf373e"
+        },
+        {
+          "userId": "user3",
+          "username": "Smokey",
+          "isDM": false,
+          "_id": "67f8384d17ba3a293fdf373f"
+        }
+      ],
+      "createdAt": "2025-04-10T21:29:49.234Z",
+      "encryptedSummary": {
+        "iv": "grbETIhgzyyzreL14FLyXg==",
+        "authTag": "2lwdSXUpupKGMRHa4SBGkw==",
+        "encryptedData": "ipWjQPm5qstI6WYvBqU5u/TSopT7bwRUOOFGiBulARR+z1hdN6YMpqEH9RnEt+zKfHtlllM7Sap691Mg61VsrlV7KpSPZper67Av..."
+      }
+    }
+  ],
+  "sessions": [
+    {
+      "_id": "67f8384d17ba3a293fdf3737",
+      "guildId": "519344197074026526",
+      "campaignName": "The Curse of the Crimson Crown",
+      "language": "en",
+      "status": "active",
+      "startTime": "2025-04-10T21:29:49.082Z",
+      "createdAt": "2025-04-10T21:29:49.082Z"
+    }
+  ]
+}

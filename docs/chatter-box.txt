@@ -1,0 +1,1562 @@
+========================
+CODE SNIPPETS
+========================
+TITLE: Setup and Install Chatterbox TTS Dependencies
+DESCRIPTION: This snippet clones the Chatterbox-TTS-Server repository and installs core PyTorch dependencies, a specific chatterbox fork, and essential server requirements. It includes error handling for optional packages like parselmouth and uses quiet installation flags.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/Chatterbox_TTS_Colab_Demo.ipynb#_snippet_0
+
+LANGUAGE: Python
+CODE:
+```
+# @title 1. Setup and Installation (Robust Version)
+# Clone repository and install dependencies with error handling
+
+# Remove existing directory and clear cache
+!rm -rf Chatterbox-TTS-Server
+!pip cache purge
+
+# Clone repository
+!git clone https://github.com/devnen/Chatterbox-TTS-Server.git
+%cd Chatterbox-TTS-Server
+
+print("✅ Repository cloned. Installing core dependencies...")
+
+# Install PyTorch with compatible torchvision
+!pip install torch==2.5.1+cu121 torchaudio==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121 -q
+
+# Install your Colab-compatible chatterbox fork
+!pip install git+https://github.com/devnen/chatterbox.git -q
+
+print("✅ Core TTS components installed. Installing server dependencies...")
+
+# Install essential server requirements (skip problematic packages)
+!pip install fastapi uvicorn pyyaml soundfile librosa safetensors -q
+!pip install python-multipart requests jinja2 watchdog aiofiles unidecode inflect tqdm -q
+!pip install pydub audiotsm -q
+
+# Try to install parselmouth (may fail on some systems)
+!pip install parselmouth -q || echo "Parselmouth installation failed - unvoiced segment removal will be disabled"
+
+print("✅ Installation complete! Some optional packages may have been skipped.")
+```
+
+----------------------------------------
+
+TITLE: Docker Compose Install (NVIDIA GPU)
+DESCRIPTION: Instructions to install and run Chatterbox TTS Server using Docker Compose for systems with NVIDIA GPUs. This involves cloning the repository and executing a Docker Compose command to build and start the service.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_30
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/devnen/Chatterbox-TTS-Server.git
+cd Chatterbox-TTS-Server
+docker compose up -d --build
+```
+
+----------------------------------------
+
+TITLE: Troubleshooting: Dependency Installation
+DESCRIPTION: Shell commands for installing specific dependencies to resolve common issues. This includes installing a particular version of ONNX to avoid build errors and installing all project requirements from a file.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_43
+
+LANGUAGE: shell
+CODE:
+```
+# Install specific ONNX version for build error resolution
+pip install onnx==1.16.0
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Install all project dependencies
+pip install -r requirements.txt
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Install libsndfile on Linux
+sudo apt install libsndfile1
+```
+
+----------------------------------------
+
+TITLE: Launch Chatterbox TTS Server
+DESCRIPTION: This snippet starts the Chatterbox TTS server using uvicorn. It includes steps to stop existing servers, clear memory, and then runs the server in a separate thread with memory-efficient settings like reduced logging and disabled access logs. It also provides tips for preventing crashes and displays a link to access the server.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/Chatterbox_TTS_Colab_Demo.ipynb#_snippet_1
+
+LANGUAGE: Python
+CODE:
+```
+# @title 2. Launch the Server! ⚡
+# Starts the TTS server with memory optimization
+
+import threading
+import time
+import uvicorn
+import gc
+from google.colab.output import serve_kernel_port_as_window
+
+port = 8004
+
+print("🛑 Stopping existing servers...")
+!fuser -k 8004/tcp 2>/dev/null || echo "Port clear"
+!pkill -f "uvicorn.*server" 2>/dev/null || echo "No running servers"
+
+print("🧹 Clearing memory...")
+gc.collect()
+
+%cd /content/Chatterbox-TTS-Server
+
+def run_server():
+    try:
+        from server import app
+        print("✅ Server starting...")
+        # Add memory-efficient settings
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=port,
+            log_level="warning",  # Reduce log verbosity
+            access_log=False      # Disable access logs to save memory
+        )
+    except Exception as e:
+        print(f"❌ Server error: {e}")
+
+print("🚀 Starting TTS server...")
+
+thread = threading.Thread(target=run_server, daemon=True)
+thread.start()
+
+time.sleep(25)  # Extra time for model loading
+
+print("🎉 Server ready! Click below:")
+serve_kernel_port_as_window(port)
+
+print("\n💡 Tips to prevent crashes:")
+print("• Use shorter texts (under 500 characters)")
+print("• Wait for each generation to complete before starting another")
+print("• If it crashes, just re-run this cell")
+```
+
+----------------------------------------
+
+TITLE: Install Core Server Dependencies
+DESCRIPTION: Installs essential server dependencies including FastAPI for the web framework, Uvicorn for running the ASGI application, and various audio processing libraries.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_19
+
+LANGUAGE: bash
+CODE:
+```
+pip install fastapi 'uvicorn[standard]' librosa safetensors soundfile pydub audiotsm praat-parselmouth python-multipart requests aiofiles PyYAML watchdog unidecode inflect tqdm
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies for CPU-Only (Bash)
+DESCRIPTION: Installs project dependencies using pip for CPU-only systems. It upgrades pip and installs packages listed in requirements.txt.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_11
+
+LANGUAGE: bash
+CODE:
+```
+# Make sure your (venv) is active
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+----------------------------------------
+
+TITLE: Install Remaining Dependencies
+DESCRIPTION: Installs any remaining necessary dependencies, such as s3tokenizer and ONNX, ensuring all components are present for the server to function correctly.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_21
+
+LANGUAGE: bash
+CODE:
+```
+pip install --no-deps s3tokenizer
+pip install onnx==1.16.0
+```
+
+----------------------------------------
+
+TITLE: Install Python Dependencies
+DESCRIPTION: Installs all required Python packages listed in the 'requirements.txt' file using pip. This command should be run after activating the virtual environment.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies for NVIDIA GPU (Bash)
+DESCRIPTION: Installs project dependencies using pip for NVIDIA GPU systems. It upgrades pip and installs packages listed in requirements-nvidia.txt, ensuring CUDA compatibility.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+# Make sure your (venv) is active
+pip install --upgrade pip
+pip install -r requirements-nvidia.txt
+```
+
+----------------------------------------
+
+TITLE: Docker Compose for Deployment
+DESCRIPTION: Shows a typical Docker Compose command to start the Chatterbox TTS server. This command handles container setup, networking, and volume mounting for persistent data.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_6
+
+LANGUAGE: Shell
+CODE:
+```
+# Command to start the Chatterbox TTS server using Docker Compose
+# Assumes a docker-compose.yaml file is present in the current directory.
+# This command starts the services in detached mode (-d).
+
+docker compose up -d
+
+# To stop the server:
+# docker compose down
+
+# To view logs:
+# docker compose logs -f
+
+# For NVIDIA GPU acceleration, ensure Docker and NVIDIA Container Toolkit are installed and configured.
+```
+
+----------------------------------------
+
+TITLE: Install PyTorch with CUDA Support
+DESCRIPTION: Example command to install PyTorch with CUDA 12.1 support. It's crucial to replace `cu121` with the CUDA version compatible with your system's NVIDIA drivers.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_15
+
+LANGUAGE: bash
+CODE:
+```
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+----------------------------------------
+
+TITLE: Install PyTorch with CUDA Support
+DESCRIPTION: Installs the PyTorch library with CUDA support, enabling GPU acceleration for deep learning models. Ensure NVIDIA drivers and CUDA toolkit are installed first.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+----------------------------------------
+
+TITLE: Python Virtual Environment Setup (Linux/macOS)
+DESCRIPTION: Commands to create and activate a Python virtual environment on Linux or macOS systems. This isolates project dependencies.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+----------------------------------------
+
+TITLE: Install Python Dependencies
+DESCRIPTION: Installs all required Python packages listed in the project's requirements file. This is a crucial step after setting up the virtual environment.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+pip install -r requirements.txt
+```
+
+----------------------------------------
+
+TITLE: Install PyTorch for Apple Silicon
+DESCRIPTION: Installs the core PyTorch library along with torchvision and torchaudio, which are essential for machine learning tasks, including TTS. This command should be run before installing Chatterbox TTS for Apple Silicon compatibility.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_41
+
+LANGUAGE: bash
+CODE:
+```
+pip install torch torchvision torchaudio
+```
+
+----------------------------------------
+
+TITLE: Pre-downloading Model Components
+DESCRIPTION: Illustrates the usage of a utility script to pre-download specific model components from Hugging Face. This can be useful for offline setups or managing dependencies.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_5
+
+LANGUAGE: Shell
+CODE:
+```
+# Script to pre-download model components to a local directory
+# This is separate from the default Hugging Face cache used at runtime.
+
+# Example: Download components for a specific model repository
+python download_model.py --model_name "resemble-ai/resemble-tts-v2" --output_dir "./local_models/resemble-tts-v2"
+
+# After downloading, you can point ChatterboxTTS to this local directory:
+# from chatterboxtts import ChatterboxTTS
+# model = ChatterboxTTS("./local_models/resemble-tts-v2")
+```
+
+----------------------------------------
+
+TITLE: Python Virtual Environment Setup (Windows)
+DESCRIPTION: Commands to create and activate a Python virtual environment on Windows systems. This isolates project dependencies.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+----------------------------------------
+
+TITLE: Install PyTorch with MPS Support
+DESCRIPTION: Installs or upgrades PyTorch, torchvision, and torchaudio, which are essential prerequisites for enabling MPS acceleration on Apple Silicon hardware. This step should be performed first to ensure compatibility.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_16
+
+LANGUAGE: bash
+CODE:
+```
+pip install --upgrade pip
+pip install torch torchvision torchaudio
+```
+
+----------------------------------------
+
+TITLE: Install Python Dependencies
+DESCRIPTION: Ensures all necessary Python packages are installed for the Chatterbox TTS Server. This is a common step to resolve startup issues and ensure the environment is correctly set up.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_39
+
+LANGUAGE: bash
+CODE:
+```
+pip install -r requirements.txt
+```
+
+----------------------------------------
+
+TITLE: Install Chatterbox TTS (No Deps)
+DESCRIPTION: Installs the chatterbox-tts package without its dependencies. This is part of the MPS setup to manage dependencies separately and avoid conflicts.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_18
+
+LANGUAGE: bash
+CODE:
+```
+pip install --no-deps git+https://github.com/resemble-ai/chatterbox.git
+```
+
+----------------------------------------
+
+TITLE: Start Chatterbox TTS Server
+DESCRIPTION: Command to launch the Chatterbox TTS server. This typically starts the web server and TTS processing engine.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_5
+
+LANGUAGE: Shell
+CODE:
+```
+python server.py
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies for AMD GPU (Bash)
+DESCRIPTION: Installs project dependencies using pip for ROCm-compatible AMD GPU systems. It upgrades pip and installs packages listed in requirements-rocm.txt, ensuring ROCm compatibility.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+# Make sure your (venv) is active
+pip install --upgrade pip
+pip install -r requirements-rocm.txt
+```
+
+----------------------------------------
+
+TITLE: Start Chatterbox TTS Server
+DESCRIPTION: Execute the main server script to launch the Chatterbox TTS Server. Ensure your Python virtual environment is activated and you are in the project's root directory. The server will output its running address and port upon successful startup.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_27
+
+LANGUAGE: bash
+CODE:
+```
+python server.py
+```
+
+----------------------------------------
+
+TITLE: NVIDIA GPU Installation Dependencies (requirements-nvidia.txt)
+DESCRIPTION: This file lists the Python packages required for installing PyTorch with CUDA 12.1 support on NVIDIA GPUs. It specifies PyTorch versions, the chatterbox fork, web framework components, and various ML, audio, and utility libraries essential for the chatterbox-tts-server project.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements-nvidia.txt#_snippet_0
+
+LANGUAGE: requirements.txt
+CODE:
+```
+# requirements-nvidia.txt (For NVIDIA GPU Installation with CUDA 12.1)
+# This file ensures a compatible set of CUDA-enabled torch packages are installed.
+
+# Use the official PyTorch package index for CUDA 12.1.
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# Pinning a compatible set of torch-related libraries is crucial to avoid dependency conflicts.
+# Updated to use PyTorch 2.5.1 for compatibility with our Colab-compatible chatterbox fork
+torch==2.5.1
+torchvision==0.20.1  # Compatible with torch 2.5.1
+torchaudio==2.5.1
+
+# --- Core Application Dependencies ---
+
+# Install chatterbox from our Colab-compatible fork instead of PyPI
+git+https://github.com/devnen/chatterbox.git
+
+# Core Web Framework
+fastapi
+uvicorn[standard]
+
+# Other ML & Audio Libraries
+numpy>=1.26.0,<3.0.0  # More flexible to avoid conflicts
+soundfile  # Requires libsndfile system library
+librosa
+safetensors
+descript-audio-codec
+
+# Configuration & Utilities
+PyYAML
+python-multipart
+requests
+Jinja2
+watchdog
+aiofiles
+unidecode
+inflect
+tqdm
+hf_transfer                     # Speed up file transfers
+
+# Audio Post-processing
+pydub
+audiotsm
+praat-parselmouth
+
+```
+
+----------------------------------------
+
+TITLE: Docker Compose Install (AMD ROCm GPU)
+DESCRIPTION: Instructions to install and run Chatterbox TTS Server using Docker Compose for systems with AMD ROCm GPUs on Linux. This requires cloning the repository, ensuring ROCm drivers are installed, and using a specific Docker Compose file.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_31
+
+LANGUAGE: bash
+CODE:
+```
+# Add user to required groups (one-time setup)
+sudo usermod -a -G video,render $USER
+# Log out and back in for changes to take effect
+
+git clone https://github.com/devnen/Chatterbox-TTS-Server.git
+cd Chatterbox-TTS-Server
+docker compose -f docker-compose-rocm.yml up -d --build
+```
+
+----------------------------------------
+
+TITLE: Install PyTorch for MPS
+DESCRIPTION: Command to install PyTorch with MPS support, specifically for Apple Silicon Macs (M1, M2, M3, etc.). This enables GPU acceleration on macOS.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_17
+
+LANGUAGE: bash
+CODE:
+```
+# With virtual environment activated
+pip install torch torchvision torchaudio
+```
+
+----------------------------------------
+
+TITLE: Run the TTS Server
+DESCRIPTION: Command to start the chatterbox-tts-server. This script handles model loading, API requests, and serves the web UI. Ensure the virtual environment is activated first.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_22
+
+LANGUAGE: python
+CODE:
+```
+python server.py
+```
+
+----------------------------------------
+
+TITLE: Install Chatterbox TTS Specific Dependencies
+DESCRIPTION: Installs specific versions of libraries required by chatterbox-tts, such as conformer, diffusers, and transformers, to ensure compatibility.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_20
+
+LANGUAGE: bash
+CODE:
+```
+pip install conformer==0.3.2 diffusers==0.29.0 resemble-perth==1.0.1 transformers==4.46.3
+```
+
+----------------------------------------
+
+TITLE: Docker Compose Install (CPU Only)
+DESCRIPTION: Instructions to install and run Chatterbox TTS Server using Docker Compose for CPU-only systems. This method uses a dedicated Docker Compose file to avoid GPU driver issues and ensure proper operation on systems without dedicated GPUs.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_32
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/devnen/Chatterbox-TTS-Server.git
+cd Chatterbox-TTS-Server
+docker compose -f docker-compose-cpu.yml up -d --build
+```
+
+----------------------------------------
+
+TITLE: Setup Python Virtual Environment (Windows)
+DESCRIPTION: Creates and activates a Python virtual environment named 'venv' on Windows. This isolates project dependencies, preventing conflicts with other Python projects.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_11
+
+LANGUAGE: powershell
+CODE:
+```
+# Ensure you are in the Chatterbox-TTS-Server directory
+python -m venv venv
+.\venv\Scripts\activate
+# Your command prompt should now be prefixed with (venv).
+```
+
+----------------------------------------
+
+TITLE: Install Chatterbox TTS and Dependencies
+DESCRIPTION: Installs the Chatterbox TTS package without its dependencies to avoid conflicts, followed by core server dependencies, specific Chatterbox dependencies, and compatible versions of s3tokenizer and ONNX.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_17
+
+LANGUAGE: bash
+CODE:
+```
+pip install --no-deps git+https://github.com/resemble-ai/chatterbox.git
+pip install fastapi 'uvicorn[standard]' librosa safetensors soundfile pydub audiotsm praat-parselmouth python-multipart requests aiofiles PyYAML watchdog unidecode inflect tqdm
+pip install conformer==0.3.2 diffusers==0.29.0 resemble-perth==1.0.1 transformers==4.46.3
+pip install --no-deps s3tokenizer
+pip install onnx==1.16.0
+```
+
+----------------------------------------
+
+TITLE: Check GPU Architecture
+DESCRIPTION: Bash commands to check the GPU architecture using `rocminfo` (if ROCm is installed) or `lspci` for general VGA information.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_37
+
+LANGUAGE: bash
+CODE:
+```
+# Method 1: Using rocminfo (if ROCm installed on host)
+rocminfo | grep "Name:"
+
+# Method 2: Using lspci
+lspci | grep VGA
+```
+
+----------------------------------------
+
+TITLE: Installation Command
+DESCRIPTION: The primary command to install all listed dependencies using pip. It's recommended to run this within an activated virtual environment after upgrading pip.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements.txt#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+pip install -r requirements.txt
+```
+
+----------------------------------------
+
+TITLE: Setup Python Virtual Environment (Linux/macOS)
+DESCRIPTION: Creates and activates a Python virtual environment named 'venv' on Linux or macOS. This isolates project dependencies, preventing conflicts with other Python projects.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+# Ensure you are in the Chatterbox-TTS-Server directory
+python3 -m venv venv
+source venv/bin/activate
+# Your command prompt should now be prefixed with (venv).
+```
+
+----------------------------------------
+
+TITLE: Clone Chatterbox TTS Server Repository
+DESCRIPTION: Clones the Chatterbox TTS Server project from GitHub using Git. This command downloads the entire project repository to your local machine, which is the initial step for installation.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/devnen/Chatterbox-TTS-Server.git
+cd Chatterbox-TTS-Server
+```
+
+----------------------------------------
+
+TITLE: Verify NVIDIA GPU Setup (Python)
+DESCRIPTION: Verifies that PyTorch can detect and utilize the NVIDIA GPU. It prints the PyTorch version, CUDA availability, and the detected GPU name.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_13
+
+LANGUAGE: python
+CODE:
+```
+import torch
+print(f'PyTorch version: {torch.__version__}')
+print(f'CUDA available: {torch.cuda.is_available()}')
+print(f'Device name: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}')
+```
+
+----------------------------------------
+
+TITLE: Verify AMD GPU Setup (Python)
+DESCRIPTION: Verifies that PyTorch can detect and utilize the AMD GPU via ROCm. It prints the PyTorch version, ROCm availability, and the detected GPU name.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_15
+
+LANGUAGE: python
+CODE:
+```
+import torch
+print(f'PyTorch version: {torch.__version__}')
+print(f'ROCm available: {torch.cuda.is_available()}')
+print(f'Device name: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}')
+```
+
+----------------------------------------
+
+TITLE: Install ONNX with Specific Version
+DESCRIPTION: Installs the ONNX runtime with a specific version (1.16.0) to resolve potential conflicts or compatibility issues with Chatterbox TTS dependencies, particularly on Apple Silicon.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_42
+
+LANGUAGE: bash
+CODE:
+```
+pip install onnx==1.16.0
+```
+
+----------------------------------------
+
+TITLE: Update Project Dependencies
+DESCRIPTION: Install or update project dependencies based on your system's hardware. Essential after pulling new code to ensure compatibility and correct versions.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_26
+
+LANGUAGE: bash
+CODE:
+```
+# For CPU-Only Systems
+pip install -r requirements.txt
+
+# For NVIDIA GPU Systems
+pip install -r requirements-nvidia.txt
+
+# For AMD GPU Systems
+pip install -r requirements-rocm.txt
+```
+
+----------------------------------------
+
+TITLE: Uninstall PyTorch (CPU)
+DESCRIPTION: Command to remove existing CPU-only PyTorch installations before installing a CUDA-enabled version. This ensures a clean slate for the GPU-optimized build.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+pip uninstall torch torchvision torchaudio -y
+```
+
+----------------------------------------
+
+TITLE: Verify MPS Availability
+DESCRIPTION: A Python script to verify that PyTorch correctly detects and can utilize the MPS (Metal Performance Shaders) backend on Apple Silicon, confirming the installation and configuration are successful.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_18
+
+LANGUAGE: python
+CODE:
+```
+import torch
+print(f'PyTorch version: {torch.__version__}')
+print(f'MPS available: {torch.backends.mps.is_available()}')
+print(f'Device will use: {"mps" if torch.backends.mps.is_available() else "cpu"}')
+```
+
+----------------------------------------
+
+TITLE: Selecting GPUs with CUDA_VISIBLE_DEVICES
+DESCRIPTION: Demonstrates how to set the CUDA_VISIBLE_DEVICES environment variable to control which GPUs PyTorch can access. Examples are provided for Linux/macOS, Windows CMD, and Windows PowerShell.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_44
+
+LANGUAGE: shell
+CODE:
+```
+# Linux/macOS: Use only physical GPU 1
+CUDA_VISIBLE_DEVICES="1" python server.py
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Windows CMD: Use only physical GPU 1
+set CUDA_VISIBLE_DEVICES=1 && python server.py
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Windows PowerShell: Use only physical GPU 1
+$env:CUDA_VISIBLE_DEVICES="1"; python server.py
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Linux/macOS: Use physical GPUs 6 and 7 (server uses GPU 6)
+CUDA_VISIBLE_DEVICES="6,7" python server.py
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Windows CMD: Use physical GPUs 6 and 7 (server uses GPU 6)
+set CUDA_VISIBLE_DEVICES=6,7 && python server.py
+```
+
+LANGUAGE: shell
+CODE:
+```
+# Windows PowerShell: Use physical GPUs 6 and 7 (server uses GPU 6)
+$env:CUDA_VISIBLE_DEVICES="6,7"; python server.py
+```
+
+----------------------------------------
+
+TITLE: Verify PyTorch CUDA Availability
+DESCRIPTION: Python script to check if PyTorch can access the GPU and display details like the number of GPUs and their names. Essential for confirming CUDA setup.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_16
+
+LANGUAGE: python
+CODE:
+```
+import torch
+print(f"PyTorch version: {torch.__version__}")
+cuda_available = torch.cuda.is_available()
+print(f"CUDA available: {cuda_available}")
+if cuda_available:
+    print(f"Number of GPUs: {torch.cuda.device_count()}")
+    print(f"Current GPU Name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
+exit()
+```
+
+----------------------------------------
+
+TITLE: Verify PyTorch CUDA Availability
+DESCRIPTION: A Python script to check if PyTorch can detect and utilize the NVIDIA GPU via CUDA. This confirms successful GPU acceleration setup.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_4
+
+LANGUAGE: Python
+CODE:
+```
+import torch
+
+if torch.cuda.is_available():
+    print(f"CUDA is available. GPU Name: {torch.cuda.get_device_name(0)}")
+else:
+    print("CUDA is not available.")
+```
+
+----------------------------------------
+
+TITLE: Web Framework and Server
+DESCRIPTION: Installs FastAPI for building modern, asynchronous web APIs and Uvicorn with standard extras for running the ASGI application efficiently.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements.txt#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+fastapi
+uvicorn[standard]
+```
+
+----------------------------------------
+
+TITLE: Scientific Computing and ML Libraries
+DESCRIPTION: Installs fundamental libraries for numerical computation (NumPy), advanced audio analysis (librosa), safe tensor serialization (safetensors), and a specific audio codec for ML applications.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements.txt#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+numpy==1.26.4
+safetensors
+descript-audio-codec
+```
+
+LANGUAGE: python
+CODE:
+```
+librosa
+```
+
+----------------------------------------
+
+TITLE: Python: Audio Post-Processing Functions
+DESCRIPTION: Shows examples of audio post-processing functions that can be applied to generated speech. These functions, typically found in `utils.py`, enhance audio quality by trimming silence, reducing internal pauses, and adjusting speed.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_33
+
+LANGUAGE: Python
+CODE:
+```
+import parselmouth # For unvoiced segment removal
+import librosa     # For speed adjustment
+
+# Assume 'audio_data' is a numpy array representing audio samples
+# and 'sample_rate' is the audio's sample rate.
+
+def trim_lead_trail_silence(audio_data, sample_rate, threshold=0.01, frame_length=2048, hop_length=512):
+    """Removes silence from the beginning and end of audio."""
+    # Implementation details using libraries like librosa or numpy
+    pass
+
+def fix_internal_silence(audio_data, sample_rate, silence_threshold=0.02, min_silence_len=0.1):
+    """Shortens unnaturally long pauses within speech."""
+    # Implementation details
+    pass
+
+def remove_long_unvoiced_segments(audio_data, sample_rate, min_duration=0.5):
+    """Removes long segments of audio with no voiced speech (requires parselmouth)."""
+    # Requires: pip install praat-parselmouth
+    try:
+        snd = parselmouth.Sound(audio_data, sample_rate)
+        # Analyze voiced/unvoiced segments and remove long unvoiced ones
+        pass
+    except ImportError:
+        print("parselmouth not installed. Skipping unvoiced segment removal.")
+    return audio_data # Placeholder
+
+def apply_speed_factor(audio_data, sample_rate, speed_factor=1.2):
+    """Modifies playback speed while attempting to preserve pitch (uses librosa).
+       Requires: pip install librosa
+    """
+    try:
+        # librosa.effects.time_stretch can be used here
+        # pitch_preserving=True might be an option depending on librosa version/usage
+        processed_audio = librosa.effects.time_stretch(audio_data, rate=speed_factor)
+        return processed_audio
+    except ImportError:
+        print("librosa not installed. Skipping speed adjustment.")
+        return audio_data # Placeholder
+
+# These functions are typically called conditionally based on config.yaml flags.
+```
+
+----------------------------------------
+
+TITLE: Chatterbox TTS Engine
+DESCRIPTION: Installs the Chatterbox TTS engine directly from its specified version on PyPI. This is the primary component for text-to-speech functionality.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements.txt#_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+chatterbox-tts==0.1.2
+```
+
+----------------------------------------
+
+TITLE: Configuration and Data Processing Tools
+DESCRIPTION: Installs libraries for managing configuration files (PyYAML), monitoring file system events (watchdog), transliterating Unicode text (unidecode), handling natural language inflection (inflect), and displaying progress bars (tqdm).
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements.txt#_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+PyYAML
+watchdog
+unidecode
+inflect
+tqdm
+```
+
+----------------------------------------
+
+TITLE: Core Deep Learning & Audio Libraries
+DESCRIPTION: Installs the core deep learning framework (PyTorch) and its associated computer vision and audio processing utilities. Versions are pinned for compatibility with the Chatterbox TTS server.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements.txt#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+torch==2.6.0
+torchaudio==2.6.0
+```
+
+LANGUAGE: python
+CODE:
+```
+torchvision==0.21.0
+```
+
+----------------------------------------
+
+TITLE: UI Initialization and Data Endpoints
+DESCRIPTION: Endpoints for retrieving initial server configuration, available reference files, and predefined voices, crucial for initializing the Web UI.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_36
+
+LANGUAGE: APIDOC
+CODE:
+```
+GET /api/ui/initial-data
+  Description: Returns a JSON object containing the full server configuration (stringified paths), lists of available reference files and predefined voices, and UI presets. Crucial for UI initialization.
+  Response Type: JSON object
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+GET /get_reference_files
+  Description: Returns a JSON list of filenames available in the 'reference_audio' directory.
+  Response Type: JSON array of strings
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+GET /get_predefined_voices
+  Description: Returns a JSON list of dictionaries, each with 'display_name' and 'filename' for voices in the 'voices' directory.
+  Response Type: JSON array of objects
+```
+
+----------------------------------------
+
+TITLE: Configure Chatterbox TTS Server
+DESCRIPTION: Details on how the `config.yaml` file is used for server settings, how it's mounted into the Docker container, and how to restart the server after configuration changes.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_40
+
+LANGUAGE: yaml
+CODE:
+```
+# Example of config.yaml usage and restart command
+# The server uses config.yaml for settings.
+# docker-compose files mount your local config.yaml to /app/config.yaml inside the container.
+# Changes to server/model/path settings require a container restart:
+docker compose restart chatterbox-tts-server
+```
+
+----------------------------------------
+
+TITLE: Troubleshoot ROCm Permission and Configuration
+DESCRIPTION: Commands to add the user to necessary groups for ROCm access and a YAML snippet for enabling privileged access to ROCm devices, often required for troubleshooting.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_38
+
+LANGUAGE: bash
+CODE:
+```
+sudo usermod -a -G video,render $USER
+# Log out and back in
+```
+
+LANGUAGE: yaml
+CODE:
+```
+privileged: true
+cap_add:
+  - SYS_PTRACE
+devices:
+  - /dev/mem
+```
+
+----------------------------------------
+
+TITLE: Navigate to Project Directory
+DESCRIPTION: Command to change the current directory to the Chatterbox-TTS-Server project folder. This is typically done before activating the virtual environment or running scripts.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_21
+
+LANGUAGE: bash
+CODE:
+```
+cd Chatterbox-TTS-Server
+```
+
+----------------------------------------
+
+TITLE: Python: Model Loading and Caching
+DESCRIPTION: Illustrates how the Chatterbox TTS server loads models from Hugging Face repositories using `ChatterboxTTS.from_pretrained`. It explains the role of the Hugging Face cache and environment variables.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_32
+
+LANGUAGE: Python
+CODE:
+```
+from chatterbox_tts import ChatterboxTTS
+
+# Load model from Hugging Face repository specified in config.yaml
+# The model is downloaded to the Hugging Face cache if not present.
+# The cache location can be controlled by the HF_HOME environment variable.
+try:
+    tts_model = ChatterboxTTS.from_pretrained(
+        repo_id=config.model.repo_id,  # e.g., "chatterbox-tts/model-v1"
+        device=config.model.device      # e.g., "cuda" or "cpu"
+    )
+    print("TTS model loaded successfully.")
+except Exception as e:
+    print(f"Error loading TTS model: {e}")
+
+# The server's engine.py uses this mechanism for runtime model access.
+# A separate script 'download_model.py' can download models to a custom path
+# defined by paths.model_cache in config.yaml, but this is not used for runtime loading.
+```
+
+----------------------------------------
+
+TITLE: Configuration and File Upload Endpoints
+DESCRIPTION: Lists conceptual API endpoints for managing server settings and uploading reference files. Specific parameters and request bodies are not detailed in the provided text.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_54
+
+LANGUAGE: APIDOC
+CODE:
+```
+POST /save_settings
+  Description: Saves current server configuration.
+
+POST /reset_settings
+  Description: Resets server settings to default values.
+
+POST /upload_reference
+  Description: Uploads a reference audio file for voice cloning.
+  Expected: File upload.
+
+POST /upload_predefined_voice
+  Description: Uploads audio files for a new predefined voice.
+  Expected: File upload.
+
+GET /get_reference_files
+  Description: Retrieves a list of available reference audio files.
+```
+
+----------------------------------------
+
+TITLE: Configuration & Utility Dependencies
+DESCRIPTION: Libraries used for project configuration management, data validation, file uploads, and general utilities.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/requirements-rocm.txt#_snippet_3
+
+LANGUAGE: text
+CODE:
+```
+pydantic
+python-dotenv # Used ONLY for initial config seeding if config.yaml missing
+Jinja2
+python-multipart # For file uploads
+requests # For health checks or other potential uses
+PyYAML # For parsing presets.yaml AND primary config.yaml
+tqdm
+```
+
+----------------------------------------
+
+TITLE: Configuration File Structure
+DESCRIPTION: Details the structure and common parameters found in the `config.yaml` file, which is used to configure server settings, model paths, and generation defaults.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_7
+
+LANGUAGE: YAML
+CODE:
+```
+# Example config.yaml for Chatterbox TTS Server
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+
+models:
+  # Specify the Hugging Face model repository or a local path
+  default_model: "resemble-ai/resemble-tts-v2"
+  # Example for a local model: "./local_models/my_custom_voice"
+
+# Optional: Configure default generation parameters
+default_generation_params:
+  seed: 42
+  temperature: 0.7
+  exaggeration: 1.0
+  cfg_scale: 3.0
+  speed_factor: 1.0
+  post_processing: true
+  trim_silence: true
+  fix_silence_duration: 0.02
+
+# Optional: Configure text splitting behavior
+text_splitting:
+  enabled: true
+  chunk_size: 500 # characters
+
+# Optional: Configure audio post-processing details
+audio_post_processing:
+  trim_silence_threshold: -30 # dB
+  trim_silence_padding: 0.1 # seconds
+  remove_long_unvoiced: true
+  long_unvoiced_threshold: 1.5 # seconds
+
+```
+
+----------------------------------------
+
+TITLE: Chatterbox TTS Server Directory Structure
+DESCRIPTION: Illustrates the file and directory organization within the Chatterbox TTS Server project. It outlines the purpose of key files and directories, aiding in understanding the project's layout.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_8
+
+LANGUAGE: text
+CODE:
+```
+Chatterbox-TTS-Server/
+│
+├── config.py             # Manages config.yaml, default values, accessors
+├── config.yaml           # PRIMARY configuration file (created/managed by server)
+├── docker-compose.yml    # Docker Compose setup for containerized deployment
+├── Dockerfile            # Docker image definition
+├── documentation.md      # This comprehensive documentation file
+├── download_model.py     # Utility to download specific model files to a local cache
+├── engine.py             # Core model loading (from_pretrained) & generation logic
+├── models.py             # Pydantic models for API request validation and structure
+├── README.md             # Project summary and quick start guide
+├── requirements.txt      # Python package dependencies
+├── server.py             # Main FastAPI application, API endpoints, UI routes
+│
+├── ui/                   # Contains all files for the Web User Interface
+│   ├── index.html        # Main HTML template for the UI
+│   ├── presets.yaml      # Predefined examples for TTS generation, loaded by the UI
+│   └── script.js         # Frontend JavaScript for UI interactivity and API communication
+│
+├── model_cache/          # Default directory for download_model.py script (Note: Not the runtime Hugging Face cache)
+├── outputs/              # Default directory for audio files saved from UI or API
+├── reference_audio/      # Default directory for user-uploaded reference audio files for voice cloning
+└── voices/               # Default directory for predefined voice audio files
+```
+
+----------------------------------------
+
+TITLE: Configuration Management (YAML)
+DESCRIPTION: The server utilizes a YAML configuration file (`config.yaml`) for managing runtime settings, model paths, and UI state. The `config.py` module handles loading, parsing, and creating this file with default values if it's missing.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_1
+
+LANGUAGE: YAML
+CODE:
+```
+# Example config.yaml structure
+server:
+  host: "127.0.0.1"
+  port: 5000
+  debug: false
+
+model:
+  name: "chatterbox-tts-model"
+  cache_dir: "./models"
+
+paths:
+  voices_dir: "./voices"
+  output_dir: "./output"
+
+ui_state:
+  last_text: ""
+  voice_mode: "predefined"
+  predefined_voice: "en_US_male_1"
+  split_text: true
+  chunk_size: 500
+  temperature: 0.7
+  exaggeration: 1.0
+  cfg_scale: 3.0
+  seed: 1234
+  speed_factor: 1.0
+  language: "en"
+  output_format: "wav"
+```
+
+LANGUAGE: Python
+CODE:
+```
+import yaml
+
+class YamlConfigManager:
+    def __init__(self, config_path='config.yaml'):
+        self.config_path = config_path
+        self.config = self.load_config()
+
+    def load_config(self):
+        try:
+            with open(self.config_path, 'r') as f:
+                return yaml.safe_load(f) or {}
+        except FileNotFoundError:
+            print(f"Config file not found at {self.config_path}. Creating with defaults.")
+            return self.create_default_config()
+        except Exception as e:
+            print(f"Error loading config: {e}")
+            return {}
+
+    def create_default_config(self):
+        # Logic to generate default config based on config.py defaults
+        default_config = {
+            'server': {'host': '127.0.0.1', 'port': 5000, 'debug': False},
+            'model': {'name': 'chatterbox-tts-model', 'cache_dir': './models'},
+            'paths': {'voices_dir': './voices', 'output_dir': './output'},
+            'ui_state': {}
+        }
+        self.save_config(default_config)
+        return default_config
+
+    def save_config(self, config_data=None):
+        if config_data is None:
+            config_data = self.config
+        try:
+            with open(self.config_path, 'w') as f:
+                yaml.dump(config_data, f, default_flow_style=False)
+        except Exception as e:
+            print(f"Error saving config: {e}")
+
+    def get(self, key, default=None):
+        return self.config.get(key, default)
+
+    def set(self, key, value):
+        self.config[key] = value
+        self.save_config()
+
+# Example usage:
+# config_manager = YamlConfigManager()
+# server_port = config_manager.get('server', {}).get('port')
+# config_manager.set('ui_state', {'last_text': 'New text'})
+```
+
+----------------------------------------
+
+TITLE: Activate Virtual Environment
+DESCRIPTION: Commands to activate the Python virtual environment on different operating systems. This is a prerequisite for running server scripts.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_20
+
+LANGUAGE: bash
+CODE:
+```
+source venv/bin/activate
+```
+
+LANGUAGE: bash
+CODE:
+```
+.\venv\Scripts\activate
+```
+
+----------------------------------------
+
+TITLE: Clone Chatterbox TTS Server Repository (Bash)
+DESCRIPTION: Clones the Chatterbox TTS Server project from GitHub using Git. This is the first step to obtain the project files locally.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/devnen/Chatterbox-TTS-Server.git
+cd Chatterbox-TTS-Server
+```
+
+----------------------------------------
+
+TITLE: Create Python Virtual Environment (Linux Bash)
+DESCRIPTION: Creates and activates a Python virtual environment named 'venv' on Linux using Bash. This isolates project dependencies.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+----------------------------------------
+
+TITLE: Chatterbox TTS Server Configuration Parameters
+DESCRIPTION: This section details the primary configuration parameters for the Chatterbox TTS Server, organized by section. It covers server hosting, model selection, TTS engine specifics, file path management, generation defaults, and audio output settings. Refer to `config.py` for a complete list.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_24
+
+LANGUAGE: APIDOC
+CODE:
+```
+server:
+  host: string
+    IP address the server listens on. `0.0.0.0` for all available interfaces.
+    Default: `0.0.0.0`
+  port: integer
+    Port number for the server.
+    Default: `8000`
+  log_file_path: string
+    Path to the server log file (relative to project root or absolute).
+    Default: `logs/tts_server.log`
+  log_file_max_size_mb: integer
+    Maximum size of a single log file before rotation.
+    Default: `10`
+  log_file_backup_count: integer
+    Number of backup log files to keep.
+    Default: `5`
+
+model:
+  repo_id: string
+    Hugging Face repository ID for the `chatterbox-tts` model.
+    Default: `ResembleAI/chatterbox`
+
+tts_engine:
+  device: string
+    TTS processing device: `auto`, `cuda`, `mps`, or `cpu`. `auto` attempts CUDA, then MPS, falls back to CPU.
+    Default: `auto`
+  predefined_voices_path: string
+    Directory for predefined voice audio files.
+    Default: `voices`
+  reference_audio_path: string
+    Directory for user-uploaded reference audio files for voice cloning.
+    Default: `reference_audio`
+  default_voice_id: string
+    Filename of the default predefined voice to use if none selected (primarily for UI).
+    Default: `default_sample.wav`
+
+paths:
+  model_cache: string
+    Directory for caching models downloaded by `download_model.py`. **Note:** Runtime uses global HF cache.
+    Default: `./model_cache`
+  output: string
+    Default directory for audio files saved from the UI or API.
+    Default: `./outputs`
+
+generation_defaults:
+  temperature: float
+    Controls randomness (0.0-1.5). Lower is more deterministic.
+    Default: `0.8`
+  exaggeration: float
+    Controls expressiveness (0.0-2.0).
+    Default: `0.5`
+  cfg_weight: float
+    Classifier-Free Guidance weight (0.0-2.0). Influences adherence to style.
+    Default: `0.5`
+  seed: integer
+    Random seed for generation. `0` often means random/engine default.
+    Default: `0`
+  speed_factor: float
+    Playback speed factor (0.25-4.0). `1.0` is normal.
+    Default: `1.0`
+  language: string
+    Default language code (e.g., `en`). Primarily for UI, engine may infer.
+    Default: `en`
+
+audio_output:
+  format: string
+    Default output audio format (e.g., `wav`, `opus`).
+    Default: `wav`
+  sample_rate: integer
+    Target sample rate for output audio files (e.g., `24000`, `48000`). Resampling applied if needed.
+    Default: `24000`
+```
+
+----------------------------------------
+
+TITLE: Create Python Virtual Environment (Windows PowerShell)
+DESCRIPTION: Creates and activates a Python virtual environment named 'venv' on Windows using PowerShell. This isolates project dependencies.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_9
+
+LANGUAGE: powershell
+CODE:
+```
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+----------------------------------------
+
+TITLE: Check Apple Silicon MPS Availability
+DESCRIPTION: Verifies if the PyTorch backend for Apple Silicon's Metal Performance Shaders (MPS) is available and correctly configured on your system. This is crucial for leveraging GPU acceleration on M1/M2/M3 Macs.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_40
+
+LANGUAGE: python
+CODE:
+```
+import torch
+print(torch.backends.mps.is_available())
+```
+
+----------------------------------------
+
+TITLE: Loading Models from Hugging Face
+DESCRIPTION: Demonstrates how to load pre-trained TTS models from the Hugging Face Hub using the ChatterboxTTS library. This is the primary method for accessing different voices.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/README.md#_snippet_4
+
+LANGUAGE: Python
+CODE:
+```
+from chatterboxtts import ChatterboxTTS
+
+# Load a model from Hugging Face Hub
+# The model repository name is specified here.
+# ChatterboxTTS will automatically download and cache the model.
+model = ChatterboxTTS.from_pretrained("resemble-ai/resemble-tts-v2")
+
+# You can also specify a specific model path or local directory if needed.
+# model = ChatterboxTTS("path/to/your/local/model")
+
+# Now you can use the model for synthesis:
+# audio = model.tts("Hello, world!")
+# model.tts_to_file("Hello, world!", file_path="output.wav")
+```
+
+----------------------------------------
+
+TITLE: Configure Audio Output Settings
+DESCRIPTION: Defines parameters for audio output, such as sample rate and file format. Incorrect settings can lead to distorted audio or no sound. Also includes `max_reference_duration_sec` for voice cloning.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_47
+
+LANGUAGE: yaml
+CODE:
+```
+audio_output:
+  sample_rate: 22050
+  format: "wav"
+  max_reference_duration_sec: 20
+```
+
+----------------------------------------
+
+TITLE: Run Chatterbox TTS Server with Docker
+DESCRIPTION: Builds and runs the Chatterbox TTS server using Docker. This provides an isolated and reproducible environment.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_6
+
+LANGUAGE: Shell
+CODE:
+```
+docker build -t chatterbox-tts .
+docker run -p 5000:5000 chatterbox-tts
+```
+
+----------------------------------------
+
+TITLE: Chatterbox TTS Server Core Modules
+DESCRIPTION: Overview of the primary Python modules and their roles within the Chatterbox TTS Server. This includes the main application entry point, TTS engine, configuration handler, utility functions, and data models.
+
+SOURCE: https://github.com/devnen/chatterbox-tts-server/blob/main/documentation.md#_snippet_49
+
+LANGUAGE: APIDOC
+CODE:
+```
+Module: server.py
+  Role: Main application entry point using FastAPI.
+  Functionality:
+    - Defines all API endpoints (e.g., /tts, /api/ui/initial-data).
+    - Handles incoming HTTP requests and validates them using Pydantic models.
+    - Serves static files for the Web UI.
+    - Orchestrates TTS generation by calling functions from engine.py and utils.py.
+    - Manages application lifecycle events (startup, shutdown), including model loading.
+
+Module: engine.py
+  Role: Manages the TTS model.
+  Functionality:
+    - load_model(): Initializes ChatterboxTTS.from_pretrained(), handling device selection (CUDA/CPU).
+    - synthesize(): Takes text and parameters, invokes chatterbox_model.generate(), returns audio tensor.
+
+Module: config.py
+  Role: Manages application configuration.
+  Functionality:
+    - Implements YamlConfigManager for loading/saving config from config.yaml.
+    - Defines DEFAULT_CONFIG structure.
+    - Provides accessor functions (e.g., get_port(), get_model_repo_id()).
+
+Module: utils.py
+  Role: Contains helper functions.
+  Functionality:
+    - Text Processing: split_into_sentences(), chunk_text_by_sentences().
+    - Audio Processing: encode_audio() (to WAV/Opus), save_audio_to_file(), apply_speed_factor().
+    - File System Utilities: get_valid_reference_files(), get_predefined_voices(), sanitize_filename(), validate_reference_audio().
+    - PerformanceMonitor class.
+
+Module: models.py
+  Role: Defines data structures for API validation.
+  Functionality:
+    - Defines Pydantic models for API request bodies and responses (e.g., CustomTTSRequest, ErrorResponse).
+```

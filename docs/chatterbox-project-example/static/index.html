@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Me</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+            --error: #ef4444;
+            --gradient-start: #6366f1;
+            --gradient-end: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .select-wrapper {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            position: relative;
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid var(--border);
+            background-color: rgba(30, 41, 59, 0.8);
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.5rem;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        select:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        .voice-visualization {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            z-index: 2;
+        }
+
+        .circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .circle.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .circle i {
+            font-size: 2.5rem;
+            color: white;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .ripple {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .ripple.active {
+            animation: ripple 2s ease-out infinite;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 40px rgba(239, 68, 68, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+            }
+        }
+
+        .chat-container {
+            flex: 1;
+            background-color: rgba(30, 41, 59, 0.8);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow-y: auto;
+            max-height: 500px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            position: relative;
+            animation: messageAppear 0.3s ease-out;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            margin-left: auto;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .message.assistant {
+            background-color: rgba(51, 65, 85, 0.8);
+            margin-right: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            background-color: var(--error);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Custom scrollbar */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 4px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .select-wrapper {
+                width: 100%;
+                max-width: none;
+            }
+
+            .voice-visualization {
+                width: 250px;
+                height: 250px;
+            }
+
+            .circle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .circle i {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chat with Me</h1>
+            <p>Choose your character and start a conversation</p>
+        </div>
+
+        <div class="controls">
+            <div class="select-wrapper">
+                <select id="character">
+                    <option value="maya">Maya</option>
+                    <option value="emma">Emma</option>
+                    <option value="wizard">Wizard</option>
+                    <option value="oddly">Oddly</option>
+                    <option value="adrian">Adrian</option>
+                    <option value="doanything">Doanything</option>
+                </select>
+            </div>
+            <div class="select-wrapper">
+                <select id="tts-provider">
+                    <option value="chatterbox">Chatterbox</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="kokoro">Kokoro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="voice-visualization">
+            <div class="circle" id="hold-to-speak">
+                <i class="fas fa-microphone"></i>
+            </div>
+            <div class="ripple"></div>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+
+        <div class="chat-container" id="chat-container"></div>
+    </div>
+
+    <script>
+        // Initialize the application
+        async function initApp() {
+            try {
+                // Get available characters and TTS providers
+                const [charactersResponse, ttsResponse, presetsResponse] = await Promise.all([
+                    fetch('/api/characters'),
+                    fetch('/api/tts-providers'),
+                    fetch('/api/presets')
+                ]);
+                
+                const characters = await charactersResponse.json();
+                const ttsProviders = await ttsResponse.json();
+                const presets = await presetsResponse.json();
+                
+                // Set default values
+                const defaultCharacter = 'emma';  // Always use Emma as default
+                const defaultTtsProvider = 'chatterbox';  // Always use Chatterbox as default
+                
+                // Populate character select
+                const characterSelect = document.getElementById('character');
+                characterSelect.innerHTML = `
+                    <option value="maya">Maya</option>
+                    <option value="emma">Emma</option>
+                    <option value="wizard">Wizard</option>
+                    <option value="oddly">Oddly</option>
+                    <option value="adrian">Adrian</option>
+                    <option value="doanything">Doanything</option>
+                `;
+                
+                // Populate TTS provider select
+                const ttsProviderSelect = document.getElementById('tts-provider');
+                ttsProviderSelect.innerHTML = `
+                    <option value="chatterbox">Chatterbox</option>
+                `;
+                
+                // Set defaults
+                characterSelect.value = defaultCharacter;
+                ttsProviderSelect.value = defaultTtsProvider;
+                
+                // Show character's greeting on load
+                const greetingResponse = await fetch(`/api/character/${defaultCharacter}/greeting`);
+                const greetingData = await greetingResponse.json();
+                addMessage(greetingData.greeting, 'assistant');
+                // Play the greeting audio
+                await generateAndPlayAudio(greetingData.greeting, defaultCharacter, defaultTtsProvider);
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                showError('Failed to initialize the application. Please try refreshing the page.');
+            }
+        }
+
+        // Call initApp when the page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Global variables for audio handling
+        let currentAudio = null;
+        let isPlaying = false;
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let animationFrame = null;
+
+        // Function to stop current audio
+        function stopCurrentAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+                isPlaying = false;
+                stopVisualization();
+            }
+        }
+
+        // Function to play audio with interruption handling
+        async function playAudio(audioData) {
+            // Stop any currently playing audio
+            stopCurrentAudio();
+            
+            // Create new audio element
+            const audio = new Audio(URL.createObjectURL(new Blob([audioData], { type: 'audio/wav' })));
+            currentAudio = audio;
+            isPlaying = true;
+            
+            // Set up audio visualization
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            }
+            
+            const source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            // Start visualization
+            startVisualization();
+            
+            // Add event listeners
+            audio.onended = () => {
+                isPlaying = false;
+                currentAudio = null;
+                stopVisualization();
+            };
+            
+            audio.onerror = (error) => {
+                console.error('Error playing audio:', error);
+                isPlaying = false;
+                currentAudio = null;
+                stopVisualization();
+            };
+            
+            // Play the audio
+            try {
+                await audio.play();
+            } catch (error) {
+                console.error('Error playing audio:', error);
+                isPlaying = false;
+                currentAudio = null;
+                stopVisualization();
+            }
+        }
+
+        // Function to start visualization
+        function startVisualization() {
+            const ripple = document.querySelector('.ripple');
+            ripple.classList.add('active');
+            
+            function updateVisualization() {
+                if (!isPlaying) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                const scale = 1 + (average / 256) * 0.5;
+                
+                ripple.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                animationFrame = requestAnimationFrame(updateVisualization);
+            }
+            
+            updateVisualization();
+        }
+
+        // Function to stop visualization
+        function stopVisualization() {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+            const ripple = document.querySelector('.ripple');
+            ripple.classList.remove('active');
+            ripple.style.transform = 'translate(-50%, -50%) scale(1)';
+        }
+
+        // Update the generateAndPlayAudio function
+        async function generateAndPlayAudio(text, character, ttsProvider) {
+            try {
+                // First, upload the reference audio file
+                const voiceConfig = {
+                    "maya": {
+                    "voice_path": "characters/maya/maya.wav",
+                    "style": "casual",
+                    "exaggeration": 0.75,
+                    "cfg_weight": 0.15,
+                },
+                "emma": {
+                    "voice_path": "characters/emma/emmastone.wav",
+                    "style": "casual",
+                    "exaggeration": 0.475,
+                    "cfg_weight": 0.35,
+                },
+                "wizard": {
+                    "voice_path": "characters/wizard/goodmorning.wav",
+                    "style": "formal",
+                    "exaggeration": 0.45,
+                    "cfg_weight": 0.35,  
+                }, 
+                "oddly": {
+                    "voice_path": "characters/oddly/oddly.wav",
+                    "style": "formal",
+                    "exaggeration": 0.375,
+                    "cfg_weight": 0.15,
+                },
+                "adrian": {
+                    "voice_path": "characters/adrian/adrian.wav",
+                    "style": "casual",
+                    "exaggeration": 0.375,
+                    "cfg_weight": 0.35,
+                },
+                "doanything": {
+                    "voice_path": "characters/doanything/doanything.wav",
+                    "style": "casual",
+                    "exaggeration": 0.375,
+                    "cfg_weight": 0.35,
+                },
+                };
+
+                const config = voiceConfig[character];
+                
+                // Fetch the audio file
+                const audioResponse = await fetch(config.voice_path);
+                if (!audioResponse.ok) {
+                    throw new Error('Failed to fetch reference audio');
+                }
+                const audioBlob = await audioResponse.blob();
+                
+                // Create form data with the correct field name 'files' instead of 'file'
+                const formData = new FormData();
+                formData.append('files', audioBlob, config.voice_path.split('/').pop());
+
+                // Upload the reference audio
+                const uploadResponse = await fetch('http://localhost:8004/upload_reference', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    console.error('Upload error:', errorText);
+                    throw new Error('Failed to upload reference audio');
+                }
+
+                // Then make the TTS request
+                const response = await fetch('http://localhost:8004/tts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        voice_mode: "clone",
+                        reference_audio_filename: config.voice_path.split('/').pop(),
+                        output_format: "wav",
+                        split_text: true,
+                        chunk_size: 150,
+                        exaggeration: config.exaggeration,
+                        cfg_weight: config.cfg_weight,
+                        temperature: 0.7,
+                        seed: 50
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('TTS error:', errorText);
+                    throw new Error('Failed to generate audio');
+                }
+                
+                const audioData = await response.arrayBuffer();
+                await playAudio(audioData);
+                
+            } catch (error) {
+                console.error('Error generating audio:', error);
+                showError('Failed to generate audio response');
+            }
+        }
+
+        // Update the handleHoldToSpeak function
+        function handleHoldToSpeak() {
+            const button = document.getElementById('hold-to-speak');
+            let mediaRecorder = null;
+            let audioChunks = [];
+            let isRecording = false;
+            
+            button.addEventListener('mousedown', async () => {
+                try {
+                    // Stop any playing audio when starting to record
+                    if (isPlaying) {
+                        stopCurrentAudio();
+                    }
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            channelCount: 1,
+                            sampleRate: 16000,
+                            sampleSize: 16,
+                            echoCancellation: true,
+                            noiseSuppression: true
+                        } 
+                    });
+                    
+                    mediaRecorder = new MediaRecorder(stream, {
+                        mimeType: 'audio/webm;codecs=opus',
+                        audioBitsPerSecond: 16000
+                    });
+                    
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+                        const reader = new FileReader();
+                        reader.readAsArrayBuffer(audioBlob);
+                        reader.onloadend = async () => {
+                            const arrayBuffer = reader.result;
+                            await sendAudioToServer(arrayBuffer);
+                        };
+                    };
+                    
+                    mediaRecorder.start(100); // Collect data every 100ms
+                    isRecording = true;
+                    button.classList.add('recording');
+                    
+                } catch (error) {
+                    console.error('Error starting recording:', error);
+                    showError('Failed to start recording');
+                }
+            });
+            
+            button.addEventListener('mouseup', () => {
+                if (mediaRecorder && isRecording) {
+                    mediaRecorder.stop();
+                    isRecording = false;
+                    button.classList.remove('recording');
+                    
+                    // Stop all tracks in the stream
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                if (mediaRecorder && isRecording) {
+                    mediaRecorder.stop();
+                    isRecording = false;
+                    button.classList.remove('recording');
+                    
+                    // Stop all tracks in the stream
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
+            });
+        }
+
+        // Initialize hold-to-speak functionality
+        handleHoldToSpeak();
+
+        // Function to add message to chat
+        function addMessage(text, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Function to clear chat
+        function clearChat() {
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = '';
+        }
+
+        // Function to show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // Update the sendAudioToServer function
+        async function sendAudioToServer(audioData) {
+            try {
+                const character = document.getElementById('character').value;
+                const ttsProvider = document.getElementById('tts-provider').value;
+
+                // First, send the audio data to get the transcription
+                const formData = new FormData();
+                formData.append('files', new Blob([audioData], { type: 'audio/webm;codecs=opus' }), 'recording.webm');
+
+                const response = await fetch('/api/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Transcription error:', errorText);
+                    throw new Error('Failed to transcribe audio');
+                }
+
+                const { text } = await response.json();
+                
+                // Add user's message to chat
+                addMessage(text, 'user');
+
+                // Generate response using OpenAI
+                const responseText = await generateResponse(text, character);
+                
+                // Add assistant's response to chat
+                addMessage(responseText, 'assistant');
+
+                // Generate and play audio for the response
+                await generateAndPlayAudio(responseText, character, ttsProvider);
+
+            } catch (error) {
+                console.error('Error processing audio:', error);
+                showError('Failed to process audio. Please try again.');
+            }
+        }
+
+        // Update the generateResponse function
+        async function generateResponse(text, character) {
+            try {
+                const response = await fetch('/api/generate-response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        character: character
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate response');
+                }
+
+                const data = await response.json();
+                return data.response;
+            } catch (error) {
+                console.error('Error generating response:', error);
+                throw error;
+            }
+        }
+
+        // Add event listener for character change
+        document.getElementById('character').addEventListener('change', async (event) => {
+            const selectedCharacter = event.target.value;
+            try {
+                // Clear the chat before showing new greeting
+                clearChat();
+                
+                const greetingResponse = await fetch(`/api/character/${selectedCharacter}/greeting`);
+                const greetingData = await greetingResponse.json();
+                addMessage(greetingData.greeting, 'assistant');
+                await generateAndPlayAudio(greetingData.greeting, selectedCharacter, 'chatterbox');
+            } catch (error) {
+                console.error('Error changing character:', error);
+                showError('Failed to change character');
+            }
+        });
+    </script>
+</body>
+</html> 

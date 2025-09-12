@@ -1,0 +1,1751 @@
+========================
+CODE SNIPPETS
+========================
+TITLE: Install discord.js using npm, yarn, pnpm, or bun
+DESCRIPTION: Installs the discord.js library using various package managers. Ensure Node.js version 22.12.0 or newer is installed.
+
+SOURCE: https://discord.js.org/docs/index
+
+LANGUAGE: bash
+CODE:
+```
+npm install discord.js
+yarn add discord.js
+pnpm add discord.js
+bun add discord.js
+```
+
+----------------------------------------
+
+TITLE: Install @discordjs/util
+DESCRIPTION: Instructions for installing the @discordjs/util package using various package managers. Node.js version 22.12.0 or newer is required.
+
+SOURCE: https://discord.js.org/docs/packages/util/1
+
+LANGUAGE: npm
+CODE:
+```
+npm install @discordjs/util
+```
+
+LANGUAGE: yarn
+CODE:
+```
+yarn add @discordjs/util
+```
+
+LANGUAGE: pnpm
+CODE:
+```
+pnpm add @discordjs/util
+```
+
+LANGUAGE: bun
+CODE:
+```
+bun add @discordjs/util
+```
+
+----------------------------------------
+
+TITLE: Create TextInputBuilder using Setters
+DESCRIPTION: This example shows how to create a TextInputBuilder and then configure its properties using setter methods. This approach is useful for building text inputs dynamically or when starting with minimal initial data.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/TextInputBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const textInput = new TextInputBuilder({
+	label: 'Type something else',
+})
+	.setCustomId('woah')
+	.setStyle(TextInputStyle.Paragraph);
+```
+
+----------------------------------------
+
+TITLE: Install @discordjs/collection
+DESCRIPTION: Instructions for installing the @discordjs/collection package using npm, yarn, or pnpm. Node.js version 22.12.0 or newer is required.
+
+SOURCE: https://discord.js.org/docs/packages/collection/1
+
+LANGUAGE: bash
+CODE:
+```
+npm install @discordjs/collection
+```
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @discordjs/collection
+```
+
+LANGUAGE: bash
+CODE:
+```
+pnpm add @discordjs/collection
+```
+
+----------------------------------------
+
+TITLE: Install @discordjs/builders
+DESCRIPTION: Instructions for installing the @discordjs/builders package using npm, yarn, and pnpm. Node.js version 22.12.0 or newer is required.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1
+
+LANGUAGE: bash
+CODE:
+```
+npm install @discordjs/builders
+```
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @discordjs/builders
+```
+
+LANGUAGE: bash
+CODE:
+```
+pnpm add @discordjs/builders
+```
+
+----------------------------------------
+
+TITLE: ShardingManager fetchClientValues Example
+DESCRIPTION: An example demonstrating how to use the fetchClientValues method to retrieve the total number of guilds across all shards.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ShardingManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+manager.fetchClientValues('guilds.cache.size')
+  .then(results => console.log(`${results.reduce((prev, val) => prev + val, 0)} total guilds`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Install @discordjs/formatters
+DESCRIPTION: Instructions for installing the @discordjs/formatters package using various package managers like npm, yarn, pnpm, and bun. Node.js version 22.12.0 or newer is required.
+
+SOURCE: https://discord.js.org/docs/packages/formatters/0
+
+LANGUAGE: bash
+CODE:
+```
+npm install @discordjs/formatters
+```
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @discordjs/formatters
+```
+
+LANGUAGE: bash
+CODE:
+```
+pnpm add @discordjs/formatters
+```
+
+LANGUAGE: bash
+CODE:
+```
+bun add @discordjs/formatters
+```
+
+----------------------------------------
+
+TITLE: Discord.js: Reply to Interaction
+DESCRIPTION: Demonstrates how to reply to a Discord interaction. The first example shows how to reply and fetch the response using the `withResponse: true` option. The second example illustrates creating an ephemeral reply with an embed.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ChatInputCommandInteraction%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+interaction.reply({ content: 'Pong!', withResponse: true })
+  .then((response) => console.log(`Reply sent with content ${response.resource.message.content}`))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+const embed = new EmbedBuilder().setDescription('Pong!');
+
+interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral })
+  .then(() => console.log('Reply sent.'))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Fetch Messages Example
+DESCRIPTION: Demonstrates how to fetch messages from a channel using discord.js. Includes examples for fetching a single message, fetching multiple messages with options like limit and cache, fetching messages around a specific ID, and filtering messages by author.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/MessageManager%3Aclass
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch a message
+channel.messages.fetch('99539446449315840')
+  .then(message => console.log(message.content))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch a maximum of 10 messages without caching
+channel.messages.fetch({ limit: 10, cache: false })
+  .then(messages => console.log(`Received ${messages.size} messages`))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch a maximum of 10 messages without caching around a message id
+channel.messages.fetch({ limit: 10, cache: false, around: '99539446449315840' })
+  .then(messages => console.log(`Received ${messages.size} messages`))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch messages and filter by a user id
+channel.messages.fetch()
+  .then(messages => console.log(`${messages.filter(message =>
+         message.author.id === '84484653687267328').size} messages`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: GatewayTypingStartDispatchData Interface Definition
+DESCRIPTION: Defines the structure for typing start dispatch data in discord.js. This interface specifies the properties required to represent a user starting to type in a channel.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GatewayTypingStartDispatchData%3AInterface
+
+LANGUAGE: TypeScript
+CODE:
+```
+export interface GatewayTypingStartDispatchData
+```
+
+----------------------------------------
+
+TITLE: JavaScript - WebSocketManager Configuration Example
+DESCRIPTION: This example demonstrates how to configure the WebSocketManager with custom options, including specifying a sharding strategy using WorkerShardingStrategy.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/OptionalWebSocketManagerOptions%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+const manager = new WebSocketManager({
+ token: process.env.DISCORD_TOKEN,
+ intents: 0, // for no intents
+ rest,
+ buildStrategy: (manager) => new WorkerShardingStrategy(manager, { shardsPerWorker: 2 }),
+});
+```
+
+----------------------------------------
+
+TITLE: Define IntegrationTypesConfigurationContext Interface
+DESCRIPTION: Defines the structure for the application's supported installation context data. It includes properties related to OAuth2 installation parameters.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/IntegrationTypesConfigurationContext%3AInterface
+
+LANGUAGE: typescript
+CODE:
+```
+export interface IntegrationTypesConfigurationContext
+```
+
+----------------------------------------
+
+TITLE: typingStart Event - Discord.js
+DESCRIPTION: Emitted when a user starts typing in a channel. Provides the typing indicator object.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Client%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+client.on('typingStart', (typing) => {
+  console.log(`${typing.user.tag} started typing in ${typing.channel.name}.`);
+});
+```
+
+----------------------------------------
+
+TITLE: StringSelectMenuBuilder Constructor Examples
+DESCRIPTION: Demonstrates creating a StringSelectMenuBuilder instance from API data and using setters with API data.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/StringSelectMenuBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const selectMenu = new StringSelectMenuBuilder({
+	custom_id: 'a cool select menu',
+	placeholder: 'select an option',
+	max_values: 2,
+	options: [
+		{ label: 'option 1', value: '1' },
+		{ label: 'option 2', value: '2' },
+		{ label: 'option 3', value: '3' },
+	],
+});
+```
+
+LANGUAGE: javascript
+CODE:
+```
+const selectMenu = new StringSelectMenuBuilder({
+	custom_id: 'a cool select menu',
+})
+	.setMinValues(1)
+	.addOptions({
+		label: 'Catchy',
+		value: 'catch',
+	});
+```
+
+----------------------------------------
+
+TITLE: Discord.js: Handle Typing Start
+DESCRIPTION: Fires when a user starts typing in a channel. It provides the typing indicator object.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ClientEvents%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+client.on('typingStart', typing => {
+  console.log(`${typing.user.tag} started typing in ${typing.channel.id}`);
+});
+```
+
+----------------------------------------
+
+TITLE: Fetch Voice State Example
+DESCRIPTION: Demonstrates how to fetch a member's voice state from Discord or the cache using the VoiceStateManager. Requires a Client instance.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/VoiceStateManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.voiceStates.fetch("66564597481480192")
+   .then(console.log)
+   .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Edit Sticker Example
+DESCRIPTION: An example of how to edit a sticker using the edit() method. It takes an options object for the properties to update and returns a Promise that resolves with the updated sticker.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Sticker%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+sticker.edit({ name: 'new name' })
+  .then(sticker => console.log(`Updated the name of the sticker to ${sticker.name}`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: delete Channel Example
+DESCRIPTION: Provides an example of how to delete a channel. The promise resolves with the deleted channel object upon successful deletion.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/PartialGroupDMChannel%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Delete the channel
+channel.delete()
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Create a Webhook with discord.js
+DESCRIPTION: Illustrates the process of creating an incoming webhook for a specific channel in discord.js. The example includes setting the webhook's name, avatar, and a reason for its creation.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.channels.createWebhook({
+  channel: '222197033908436994',
+  name: 'Snek',
+  avatar: 'https://i.imgur.com/mI8XcpG.jpg',
+  reason: 'Needed a cool new Webhook'
+})
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: IntegrationApplication toString Example
+DESCRIPTION: Demonstrates how the toString method of the IntegrationApplication class can be used. When concatenated with a string, it automatically returns the application's name.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/IntegrationApplication%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Logs: Application name: My App
+console.log(`Application name: ${application}`);
+```
+
+----------------------------------------
+
+TITLE: StartedOnboarding Flag
+DESCRIPTION: This flag indicates that a member has started the onboarding process. It is represented by the value 8.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildMemberFlags%3AEnum
+
+LANGUAGE: TypeScript
+CODE:
+```
+StartedOnboarding = 8
+```
+
+----------------------------------------
+
+TITLE: JavaScript - WebSocketManager Session Info Retrieval Example
+DESCRIPTION: This example shows how to implement a custom session information retrieval function for the WebSocketManager, typically used for resuming WebSocket connections.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/OptionalWebSocketManagerOptions%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+const manager = new WebSocketManager({
+  async retrieveSessionInfo(shardId): Awaitable<SessionInfo | null> {
+    // Fetch this info from redis or similar
+    return { sessionId: string, sequence: number };
+    // Return null if no information is found
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: DirectoryChannel Mention Example
+DESCRIPTION: Shows how a DirectoryChannel object can be automatically converted to its mention string when concatenated with another string.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/DirectoryChannel%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Logs: Hello from <#123456789012345678>!
+console.log(`Hello from ${channel}!`);
+```
+
+----------------------------------------
+
+TITLE: Reply to Interaction with Response
+DESCRIPTION: Creates a reply to the interaction and fetches the response using the `withResponse: true` option. Includes examples for simple replies and replies with embeds.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/UserContextMenuCommandInteraction%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+interaction.reply({ content: 'Pong!', withResponse: true })
+  .then((response) => console.log(`Reply sent with content ${response.resource.message.content}`))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+const embed = new EmbedBuilder().setDescription('Pong!');
+
+interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral })
+  .then(() => console.log('Reply sent.'))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Delete Sticker Example
+DESCRIPTION: An example of how to delete a sticker using the delete() method. It returns a Promise that resolves with the deleted sticker.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Sticker%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+sticker.delete()
+  .then(sticker => console.log(`Deleted sticker ${sticker.name}`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Format String as Code Block
+DESCRIPTION: Example of using the `codeBlock` function from the @discordjs/formatters package to format a string as a code block for Discord. This example uses ES modules.
+
+SOURCE: https://discord.js.org/docs/packages/formatters/0
+
+LANGUAGE: javascript
+CODE:
+```
+import { codeBlock } from '@discordjs/formatters';
+
+const formattedCode = codeBlock('hello world!');
+console.log(formattedCode);
+
+// Prints:
+// ```
+// hello world!
+// ```
+```
+
+----------------------------------------
+
+TITLE: ContainerBuilder Methods
+DESCRIPTION: Provides examples of various methods available on the ContainerBuilder class, such as adding different types of components, clearing properties, setting properties like accent color and ID, and serializing the builder to JSON.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ContainerBuilder%3AClass
+
+LANGUAGE: typescript
+CODE:
+```
+builder.addActionRowComponents(...);
+builder.addFileComponents(...);
+builder.addMediaGalleryComponents(...);
+builder.addSectionComponents(...);
+builder.addSeparatorComponents(...);
+builder.addTextDisplayComponents(...);
+builder.clearAccentColor();
+builder.clearId();
+builder.setAccentColor(color);
+builder.setId(id);
+builder.setSpoiler(spoiler);
+builder.spliceComponents(index, deleteCount, ...components);
+builder.toJSON();
+```
+
+----------------------------------------
+
+TITLE: Create a Discord Role
+DESCRIPTION: Demonstrates how to create a new role in a Discord guild using discord.js. Includes examples for basic creation, creation with data and reason, and creation with holographic colors.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RoleManager%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+guild.roles.create()
+  .then(console.log)
+  .catch(console.error);
+```
+
+LANGUAGE: JavaScript
+CODE:
+```
+guild.roles.create({
+  name: 'Super Cool Blue People',
+  reason: 'we needed a role for Super Cool People',
+  colors: {
+    primaryColor: Colors.Blue,
+  },
+})
+  .then(console.log)
+  .catch(console.error);
+```
+
+LANGUAGE: JavaScript
+CODE:
+```
+guild.roles.create({
+  name: 'Holographic Role',
+  reason: 'Creating a role with holographic effect',
+  colors: {
+    primaryColor: Constants.HolographicStyle.Primary,
+    secondaryColor: Constants.HolographicStyle.Secondary,
+    tertiaryColor: Constants.HolographicStyle.Tertiary,
+  },
+})
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Get Last Value/Key from Discord.js Collection
+DESCRIPTION: Obtains the last value or key from a Discord.js Collection. It can return a single value/key or an array of values/keys, supporting negative amounts to start from the beginning.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/LimitedCollection%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+collection.last();
+```
+
+LANGUAGE: javascript
+CODE:
+```
+collection.lastKey();
+```
+
+----------------------------------------
+
+TITLE: Send Basic Message
+DESCRIPTION: Example of sending a simple text message using a webhook.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Webhook%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+webhook.send('hello!')
+  .then(message => console.log(`Sent message: ${message.content}`))
+  .catch(console.error);
+
+```
+
+----------------------------------------
+
+TITLE: Send Remote File
+DESCRIPTION: Example of sending a file from a remote URL using a webhook.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Webhook%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+webhook.send({
+  files: ['https://cdn.discordapp.com/icons/222078108977594368/6e1019b3179d71046e463a75915e7244.png?size=2048']
+})
+  .then(console.log)
+  .catch(console.error);
+
+```
+
+----------------------------------------
+
+TITLE: discord.js - Edit Permission Overwrites Example
+DESCRIPTION: An example demonstrating how to edit permission overwrites for a user or role in a discord.js channel. It shows how to deny 'SendMessages' permission and logs the result or any errors.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/PermissionOverwrites%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Update permission overwrites
+permissionOverwrites.edit({
+  SendMessages: false
+})
+  .then(channel => console.log(channel.permissionOverwrites.get(message.author.id)))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Get First Value/Key from Discord.js Collection
+DESCRIPTION: Obtains the first value or key from a Discord.js Collection. It can return a single value/key or an array of values/keys, supporting negative amounts to start from the end.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/LimitedCollection%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+collection.first();
+```
+
+LANGUAGE: javascript
+CODE:
+```
+collection.firstKey();
+```
+
+----------------------------------------
+
+TITLE: RPCSpeakingStartDispatchData Interface Definition
+DESCRIPTION: Defines the structure for dispatch data when a user starts speaking in a Discord RPC context. It includes the channel ID and user ID.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCSpeakingStartDispatchData%3AInterface
+
+LANGUAGE: TypeScript
+CODE:
+```
+export interface RPCSpeakingStartDispatchData
+```
+
+----------------------------------------
+
+TITLE: Instantiate ReactionUserManager
+DESCRIPTION: Shows the basic instantiation of the ReactionUserManager class.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ReactionUserManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+export class ReactionUserManager extends CachedManager<Snowflake, User, UserResolvable>
+
+```
+
+----------------------------------------
+
+TITLE: WebSocketManager Sharding Strategy Example
+DESCRIPTION: Demonstrates how to configure a custom sharding strategy for the WebSocketManager using WorkerShardingStrategy.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/WebSocketManagerOptions%3AInterface
+
+LANGUAGE: javascript
+CODE:
+```
+const manager = new WebSocketManager({
+ token: process.env.DISCORD_TOKEN,
+ intents: 0, // for no intents
+ rest,
+ buildStrategy: (manager) => new WorkerShardingStrategy(manager, { shardsPerWorker: 2 }),
+});
+```
+
+----------------------------------------
+
+TITLE: Send Local File
+DESCRIPTION: Example of sending a local file using a webhook, specifying attachment path and name.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Webhook%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+webhook.send({
+  files: [{
+    attachment: 'entire/path/to/file.jpg',
+    name: 'file.jpg'
+  }]
+})
+  .then(console.log)
+  .catch(console.error);
+
+```
+
+----------------------------------------
+
+TITLE: Discord.js Collection: Get Last Key
+DESCRIPTION: Obtains the last key(s) from a Discord.js Collection. It can return a single key or an array of keys, supporting negative amounts to retrieve keys starting from the beginning.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Collection%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+lastKey() : K | undefined
+```
+
+----------------------------------------
+
+TITLE: Create Media Gallery with Setters
+DESCRIPTION: Illustrates creating a MediaGalleryBuilder instance with initial API data and then adding more items using the addItems method.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/MediaGalleryBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const mediaGallery = new MediaGalleryBuilder({
+	items: [
+		{
+			description: "alt text",
+			media: {
+				url: 'https://cdn.discordapp.com/embed/avatars/5.png',
+			},
+		},
+	],
+})
+	.addItems(item2, item3);
+```
+
+----------------------------------------
+
+TITLE: Discord.js Collection: Get Last Value
+DESCRIPTION: Obtains the last value(s) from a Discord.js Collection. It can return a single value or an array of values, supporting negative amounts to retrieve elements starting from the beginning.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Collection%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+last() : V | undefined
+```
+
+----------------------------------------
+
+TITLE: Invite Class Example Usage
+DESCRIPTION: Demonstrates how to use the `Invite` object's `toString` method, which automatically converts it to its invite URL when concatenated with a string.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Invite%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Logs: Invite: https://discord.gg/A1b2C3
+console.log(`Invite: ${invite}`);
+```
+
+----------------------------------------
+
+TITLE: Create Action Row with Setters and API Data
+DESCRIPTION: Shows how to initialize an ActionRowBuilder with API data and then chain methods like addComponents to further configure the action row, using a button component as an example.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ActionRowBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const actionRow = new ActionRowBuilder({
+	components: [
+		{
+			custom_id: "custom id",
+			label: "Click me",
+			style: ButtonStyle.Primary,
+			type: ComponentType.Button,
+		},
+	]
+})
+	.addComponents(button2, button3);
+```
+
+----------------------------------------
+
+TITLE: Send Embed with Local Image
+DESCRIPTION: Example of sending an embed with a local image attached using a webhook.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Webhook%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+webhook.send({
+  content: 'This is an embed',
+  embeds: [{
+    thumbnail: {
+         url: 'attachment://file.jpg'
+      }
+   }],
+   files: [{
+      attachment: 'entire/path/to/file.jpg',
+      name: 'file.jpg'
+   }]
+})
+  .then(console.log)
+  .catch(console.error);
+
+```
+
+----------------------------------------
+
+TITLE: Handle Client Ready Event in Discord.js
+DESCRIPTION: This event fires when the Discord.js client has successfully connected and is ready to start processing events and commands.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Client%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+client.on('ready', (client) => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
+```
+
+----------------------------------------
+
+TITLE: GuildPreview toString Example
+DESCRIPTION: Demonstrates how the toString method of GuildPreview automatically returns the guild's name when concatenated with a string.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildPreview%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+console.log(`Hello from ${previewGuild}!`);
+```
+
+----------------------------------------
+
+TITLE: Send Slack Message Example
+DESCRIPTION: Demonstrates how to send a raw Slack message using the sendSlackMessage method of the WebhookClient. This method allows for rich message formatting compatible with Slack's message structure.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/WebhookClient%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Send a slack message
+webhook.sendSlackMessage({
+  'username': 'Wumpus',
+  'attachments': [{
+    'pretext': 'this looks pretty cool',
+    'color': '#F0F',
+    'footer_icon': 'http://snek.s3.amazonaws.com/topSnek.png',
+    'footer': 'Powered by sneks',
+    'ts': Date.now() / 1_000
+  }]
+}).catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Set Integration Types (Discord.js)
+DESCRIPTION: Sets the integration types for which the slash command is available. This can include user installs or guild installs.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/SlashCommandBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+setIntegrationTypes(...integrationTypes: RestOrArray<ApplicationIntegrationType>)
+```
+
+----------------------------------------
+
+TITLE: Reply to Discord Interaction with Content
+DESCRIPTION: This example demonstrates how to reply to a Discord interaction with plain text content and fetch the response. It uses the `reply` method with the `withResponse: true` option.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/CommandInteraction%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+interaction.reply({ content: 'Pong!', withResponse: true })
+  .then((response) => console.log(`Reply sent with content ${response.resource.message.content}`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Fetch All Channels with discord.js
+DESCRIPTION: Shows how to fetch all channels within a guild using the GuildChannelManager. This example logs the total number of channels found in the guild's cache.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+message.guild.channels.fetch()
+  .then(channels => console.log(`There are ${channels.size} channels.`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Define RPCCommandGetApplicationTicketPayload Interface
+DESCRIPTION: Defines the structure for the RPCCommandGetApplicationTicketPayload, which extends RPCCommandMessage and includes specific arguments for getting an application ticket.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCCommandGetApplicationTicketPayload%3AInterface
+
+LANGUAGE: TypeScript
+CODE:
+```
+export interface RPCCommandGetApplicationTicketPayload extends RPCCommandMessage<RPCCommands.GetApplicationTicket>
+
+```
+
+----------------------------------------
+
+TITLE: Instantiate ThumbnailBuilder with API data
+DESCRIPTION: Creates a new ThumbnailBuilder instance using an existing API data object. This allows for pre-populating the thumbnail with properties like description and media URL.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ThumbnailBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const thumbnail = new ThumbnailBuilder({
+	description: 'some text',
+ 	media: {
+ 		url: 'https://cdn.discordapp.com/embed/avatars/4.png',
+ 	},
+});
+```
+
+----------------------------------------
+
+TITLE: Define RPCStartPurchaseResult Interface (JavaScript)
+DESCRIPTION: Defines the RPCStartPurchaseResult interface, which extends RPCCommandMessage for starting purchases within the Discord RPC system. It specifies the structure for command messages related to purchase operations.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCStartPurchaseResult%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+export interface RPCStartPurchaseResult extends RPCCommandMessage<RPCCommands.StartPurchase>
+
+```
+
+----------------------------------------
+
+TITLE: Create Media Gallery from API Data
+DESCRIPTION: Demonstrates how to create a new MediaGalleryBuilder instance using an existing API data object, initializing it with a list of media items.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/MediaGalleryBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const mediaGallery = new MediaGalleryBuilder({
+	items: [
+		{
+			description: "Some text here",
+			media: {
+				url: 'https://cdn.discordapp.com/embed/avatars/2.png',
+			},
+		},
+	],
+});
+```
+
+----------------------------------------
+
+TITLE: Sending a Direct Message
+DESCRIPTION: Example of how to send a direct message to a Discord user using the User class's send method.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/User%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Send a direct message
+user.send('Hello!')
+  .then(message => console.log(`Sent message: ${message.content} to ${user.tag}`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Define RPCCommandOpenOverlayVoiceSettingsPayload Interface
+DESCRIPTION: Defines the RPCCommandOpenOverlayVoiceSettingsPayload interface, extending RPCCommandMessage with specific arguments for opening overlay voice settings.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCCommandOpenOverlayVoiceSettingsPayload%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+export interface RPCCommandOpenOverlayVoiceSettingsPayload extends RPCCommandMessage<RPCCommands.OpenOverlayVoiceSettings>
+
+```
+
+----------------------------------------
+
+TITLE: Team toString Method Example
+DESCRIPTION: Demonstrates how the toString method of the Team class can be used. When concatenated with a string, it automatically returns the Team's name.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Team%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+console.log(`Team name: ${team}`);
+```
+
+----------------------------------------
+
+TITLE: WebSocketManager Session Info Retrieval Example
+DESCRIPTION: Illustrates how to implement a custom function to retrieve session information for shard resumption.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/WebSocketManagerOptions%3AInterface
+
+LANGUAGE: javascript
+CODE:
+```
+const manager = new WebSocketManager({
+  async retrieveSessionInfo(shardId): Awaitable<SessionInfo | null> {
+    // Fetch this info from redis or similar
+    return { sessionId: string, sequence: number };
+    // Return null if no information is found
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: discord.js GuildMemberManager Fetch All Members Example
+DESCRIPTION: Demonstrates fetching all members from a guild. This is a common operation for retrieving guild member data.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildMemberManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.members.fetch()
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Create a Voice Channel with Permissions
+DESCRIPTION: Shows how to create a new voice channel with specific permission overwrites using discord.js. This example sets permissions for a specific user, denying them channel view access.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.channels.create({
+  name: 'new-general',
+  type: ChannelType.GuildVoice,
+  permissionOverwrites: [
+     {
+       id: message.author.id,
+       deny: [PermissionFlagsBits.ViewChannel],
+    },
+  ],
+})
+```
+
+----------------------------------------
+
+TITLE: Define RPCCommandStartPurchasePayload Interface (JavaScript)
+DESCRIPTION: Defines the RPCCommandStartPurchasePayload interface, which extends RPCCommandMessage for the StartPurchase RPC command. It includes arguments, command details, and a nonce.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCCommandStartPurchasePayload%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+export interface RPCCommandStartPurchasePayload extends RPCCommandMessage<RPCCommands.StartPurchase>
+```
+
+----------------------------------------
+
+TITLE: Fetch Messages Example
+DESCRIPTION: Demonstrates how to fetch messages from a channel using the DMMessageManager. It shows fetching a single message, fetching multiple messages without caching, and fetching messages around a specific message ID.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/DMMessageManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch a message
+channel.messages.fetch('99539446449315840')
+  .then(message => console.log(message.content))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch a maximum of 10 messages without caching
+channel.messages.fetch({ limit: 10, cache: false })
+  .then(messages => console.log(`Received ${messages.size} messages`))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch a maximum of 10 messages without caching around a message id
+channel.messages.fetch({ limit: 10, cache: false, around: '99539446449315840' })
+  .then(messages => console.log(`Received ${messages.size} messages`))
+  .catch(console.error);
+```
+
+LANGUAGE: javascript
+CODE:
+```
+// Fetch messages and filter by a user id
+channel.messages.fetch()
+  .then(messages => console.log(`${messages.filter(message =>
+         message.author.id === '84484653687267328').size} messages`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: DataManager Methods (JavaScript)
+DESCRIPTION: Explains the methods of the DataManager class: 'resolve' to get a data object from an instance, and 'resolveId' to get an instance ID.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/DataManager%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+resolve(idOrInstance: Holds) : Holds
+resolveId(idOrInstance: Key | Holds) : Key
+valueOf() : Collection<Key, Holds>
+```
+
+----------------------------------------
+
+TITLE: Fetch Active Threads with discord.js
+DESCRIPTION: Demonstrates how to fetch all active thread channels within a guild using the GuildChannelManager. The example logs the number of threads found.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+message.guild.channels.fetchActiveThreads()
+  .then(fetched => console.log(`There are ${fetched.threads.size} threads.`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Fetch Pinned Messages Example
+DESCRIPTION: Shows how to fetch pinned messages within a channel using the DMMessageManager. It retrieves pinned messages and logs their count.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/DMMessageManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Get pinned messages
+channel.messages.fetchPins()
+  .then(messages => console.log(`Received ${messages.items.length} messages`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: TeamMember toString Method Example
+DESCRIPTION: Demonstrates the usage of the toString method for the TeamMember class. When concatenated with a string, it automatically returns the team member's mention.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/TeamMember%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+console.log(`Team Member's mention: ${teamMember}`);
+```
+
+----------------------------------------
+
+TITLE: GatewayActivityTimestamps Properties
+DESCRIPTION: Details the optional 'end' and 'start' properties of the GatewayActivityTimestamps interface. These properties represent the Unix time in milliseconds when an activity ends or starts, respectively.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GatewayActivityTimestamps%3AInterface
+
+LANGUAGE: TypeScript
+CODE:
+```
+end?: number
+  Unix time (in milliseconds) of when the activity ends
+```
+
+LANGUAGE: TypeScript
+CODE:
+```
+start?: number
+  Unix time (in milliseconds) of when the activity started
+```
+
+----------------------------------------
+
+TITLE: Create ThumbnailBuilder with setters
+DESCRIPTION: Demonstrates creating a ThumbnailBuilder and then using its setter methods to configure properties like the media URL and description. This approach is useful for building thumbnails programmatically.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ThumbnailBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const thumbnail = new ThumbnailBuilder({
+	media: {
+ 		url: 'attachment://image.png',
+ 	},
+})
+	.setDescription('alt text');
+```
+
+----------------------------------------
+
+TITLE: ContainerBuilder Constructor with Setters and API Data
+DESCRIPTION: Illustrates creating a ContainerBuilder instance with initial API data and then chaining methods like addComponents to further configure it.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ContainerBuilder%3AClass
+
+LANGUAGE: typescript
+CODE:
+```
+const container = new ContainerBuilder({
+	components: [
+		{
+			content: "# Heading",
+			type: ComponentType.TextDisplay,
+		},
+	]
+})
+	.addComponents(separator, section);
+```
+
+----------------------------------------
+
+TITLE: Create a Text Channel with discord.js
+DESCRIPTION: Demonstrates how to create a new text channel within a guild using the GuildChannelManager. It includes an example of providing a reason for the channel creation.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.channels.create({ name: 'new-general', reason: 'Needed a cool new channel' })
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Create or Get Singleton ShardClientUtil
+DESCRIPTION: A static method to create or retrieve the singleton instance of ShardClientUtil for a given Client and ShardingManagerMode. This ensures a single point of control for shard management.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ShardClientUtil%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+ShardClientUtil.singleton(client, mode)
+```
+
+----------------------------------------
+
+TITLE: Create a Discord Bot with discord.js
+DESCRIPTION: Creates a basic Discord bot that logs in, logs the bot's tag when ready, and responds to the 'ping' slash command with 'Pong!'. Requires the Guilds intent and a token.
+
+SOURCE: https://discord.js.org/docs/index
+
+LANGUAGE: javascript
+CODE:
+```
+import { Client, Events, GatewayIntentBits } from 'discord.js';
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.on(Events.ClientReady, readyClient => {
+  console.log(`Logged in as ${readyClient.user.tag}!`);
+});
+
+client.on(Events.InteractionCreate, async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === 'ping') {
+    await interaction.reply('Pong!');
+  }
+});
+
+client.login(TOKEN);
+```
+
+----------------------------------------
+
+TITLE: Fetch Discord Roles
+DESCRIPTION: Illustrates how to fetch roles from a Discord guild using discord.js. Includes examples for fetching all roles and fetching a single role by its ID, logging details about the fetched roles.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RoleManager%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+message.guild.roles.fetch()
+  .then(roles => console.log(`There are ${roles.size} roles.`))
+  .catch(console.error);
+```
+
+LANGUAGE: JavaScript
+CODE:
+```
+message.guild.roles.fetch('222078108977594368')
+  .then(role => console.log(`The role color is: ${role.colors.primaryColor}`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Define GuildOnboardingPromptOptionData Interface (JavaScript)
+DESCRIPTION: Defines the structure for guild onboarding prompt option data in discord.js. This interface specifies the properties required to configure an option, including optional channels, description, emoji, ID, roles, and a mandatory title.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildOnboardingPromptOptionData%3AInterface
+
+LANGUAGE: javascript
+CODE:
+```
+export interface GuildOnboardingPromptOptionData
+```
+
+----------------------------------------
+
+TITLE: createMessageComponentCollector Example
+DESCRIPTION: Shows how to create a collector for message component interactions. It logs collected items and the total count when the collector ends.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/PartialGroupDMChannel%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Create a button interaction collector
+const filter = (interaction) => interaction.customId === 'button' && interaction.user.id === 'someId';
+const collector = channel.createMessageComponentCollector({ filter, time: 15_000 });
+collector.on('collect', interaction => console.log(`Collected ${interaction.customId}`));
+collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+```
+
+----------------------------------------
+
+TITLE: Define WelcomeScreen Class in JavaScript
+DESCRIPTION: This snippet shows the definition of the WelcomeScreen class, which extends the Base class in discord.js. It is used to represent a guild's welcome screen configuration.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/WelcomeScreen%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+export class WelcomeScreen extends Base
+```
+
+----------------------------------------
+
+TITLE: discord.js GuildMemberManager Fetch Multiple Members Example
+DESCRIPTION: Demonstrates fetching multiple members from a guild by providing an array of user IDs or objects, optionally including their presence information.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildMemberManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.members.fetch({ user: ['66564597481480192', '191615925336670208'], withPresences: true })
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Discord RPC Speaking Start Event
+DESCRIPTION: Represents the 'SPEAKING_START' event in Discord's Rich Presence, indicating that a user has started speaking in a voice channel. This event is part of the RPCEvents enum.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCEvents%3AEnum
+
+LANGUAGE: typescript
+CODE:
+```
+SpeakingStart = "SPEAKING_START"
+```
+
+----------------------------------------
+
+TITLE: GuildOnboardingPrompt Class Definition
+DESCRIPTION: Defines the GuildOnboardingPrompt class, which extends the Base class. This class represents the data for a guild's onboarding prompts in discord.js.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildOnboardingPrompt%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+export class GuildOnboardingPrompt extends Base
+```
+
+----------------------------------------
+
+TITLE: Fetch a Single Channel with discord.js
+DESCRIPTION: Illustrates how to fetch a specific channel from a guild using its ID. The example retrieves the channel and logs its name to the console.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+message.guild.channels.fetch('222197033908436994')
+  .then(channel => console.log(`The channel name is: ${channel.name}`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: discord.js GuildMemberManager Fetch Member by Query Example
+DESCRIPTION: Illustrates fetching members from a guild using a query string, allowing for searching members by username or other criteria. This is useful for finding specific members.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildMemberManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.members.fetch({ query: 'hydra', limit: 1 })
+  .then(console.log)
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Client Properties
+DESCRIPTION: Details various properties of the `Client` class, including managers for guilds, channels, users, and WebSocket, as well as status information like readyAt and uptime.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Client%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+application : If<Ready, ClientApplication>
+channels : ChannelManager
+emojis : BaseGuildEmojiManager
+guilds : GuildManager
+options : Omit<ClientOptions, 'intents'> & { intents: IntentsBitField }
+readyAt : If<Ready, Date>
+readyTimestamp : If<Ready, number>
+rest : REST
+shard : ShardClientUtil | null
+sweepers : Sweepers
+token : If<Ready, string, string | null>
+uptime : If<Ready, number>
+user : If<Ready, ClientUser>
+users : UserManager
+voice : ClientVoiceManager
+ws : WebSocketManager
+```
+
+----------------------------------------
+
+TITLE: Set Guild Scheduled Event Start Time (Discord.js)
+DESCRIPTION: Sets a new scheduled start time for the guild scheduled event. This method returns a Promise that resolves with the updated GuildScheduledEvent object. It can optionally take a reason for the change.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildScheduledEvent%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guildScheduledEvent.setScheduledStartTime('2022-09-24T00:00:00+05:30')
+ .then(guildScheduledEvent => console.log(`Set the start time to: ${guildScheduledEvent.scheduledStartTime}`))
+ .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Get Text Input Value by Custom ID (discord.js)
+DESCRIPTION: Extracts the string value of a text input component from modal submission data, identified by its custom ID. This is a direct way to get plain text input.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ModalSubmitFields%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+getTextInputValue(customId: string): string
+```
+
+----------------------------------------
+
+TITLE: Fetch Webhooks for a Channel with discord.js
+DESCRIPTION: Shows how to fetch all webhooks associated with a specific channel using its ID. The example logs the count of webhooks found for the channel.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildChannelManager%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+guild.channels.fetchWebhooks('769862166131245066')
+  .then(hooks => console.log(`This channel has ${hooks.size} hooks`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: Login Client
+DESCRIPTION: Logs the client in, establishing a WebSocket connection to Discord. This method takes an optional token and returns a Promise that resolves to the token of the logged-in account.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Client%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+client.login('my token');
+```
+
+----------------------------------------
+
+TITLE: Discord.js Ready Event (Deprecated)
+DESCRIPTION: Deprecated event emitted when the client becomes ready. Use `clientReady` instead. This event signifies the client is ready to start working.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Client%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+// Deprecated: Use clientReady instead
+client.on('ready', (client) => {
+  console.log(`Logged in as ${client.user.tag}! (Deprecated)`);
+});
+```
+
+----------------------------------------
+
+TITLE: Send Message in Thread
+DESCRIPTION: Example of sending a message to a specific thread using a webhook.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/Webhook%3AClass
+
+LANGUAGE: JavaScript
+CODE:
+```
+webhook.send({ content: 'hello!', threadId: '836856309672348295' })
+  .then(message => console.log(`Sent message: ${message.content}`))
+  .catch(console.error);
+
+```
+
+----------------------------------------
+
+TITLE: Create Text Display from API Data
+DESCRIPTION: Demonstrates how to create a new TextDisplayBuilder instance by providing partial API component data during construction. This is useful for initializing the builder with existing component configurations.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/TextDisplayBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const textDisplay = new TextDisplayBuilder({
+	content: 'some text',
+});
+```
+
+----------------------------------------
+
+TITLE: Fetch Pinned Messages Example
+DESCRIPTION: Shows how to fetch pinned messages within a channel using discord.js. The returned collection may not include reaction data, which needs to be fetched separately.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/MessageManager%3Aclass
+
+LANGUAGE: javascript
+CODE:
+```
+// Get pinned messages
+channel.messages.fetchPins()
+  .then(messages => console.log(`Received ${messages.items.length} messages`))
+  .catch(console.error);
+```
+
+----------------------------------------
+
+TITLE: GuildOnboardingPromptOption Class Definition
+DESCRIPTION: Defines the GuildOnboardingPromptOption class, which extends the Base class. This class represents an option within a guild's onboarding prompt structure.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/GuildOnboardingPromptOption%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+export class GuildOnboardingPromptOption extends Base
+```
+
+----------------------------------------
+
+TITLE: Get Interaction Value
+DESCRIPTION: Returns the string value of the interaction. This method is inherited from Base.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/UserContextMenuCommandInteraction%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+interaction.valueOf()
+```
+
+----------------------------------------
+
+TITLE: Define RPCSubscribeSpeakingStartArgs Interface
+DESCRIPTION: Defines the structure for arguments used when subscribing to speaking start events in the Discord RPC API. It includes the channel ID for the target channel.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/RPCSubscribeSpeakingStartArgs%3AInterface
+
+LANGUAGE: TypeScript
+CODE:
+```
+export interface RPCSubscribeSpeakingStartArgs
+```
+
+----------------------------------------
+
+TITLE: ContainerBuilder Constructor with API Data
+DESCRIPTION: Demonstrates creating a new ContainerBuilder instance using an existing API data object, initializing its components.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ContainerBuilder%3AClass
+
+LANGUAGE: typescript
+CODE:
+```
+const container = new ContainerBuilder({
+	components: [
+		{
+			content: "Some text here",
+			type: ComponentType.TextDisplay,
+		},
+	]
+});
+```
+
+----------------------------------------
+
+TITLE: Get Mentionable Option
+DESCRIPTION: Retrieves a mentionable option (user, role, or member) from the command interaction.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/CommandInteractionOptionResolver%3AClass
+
+LANGUAGE: typescript
+CODE:
+```
+getMentionable(
+name: string,
+required: true = false
+) : NonNullable<CommandInteractionOption<Cached>['member' | 'role' | 'user']>
+```
+
+----------------------------------------
+
+TITLE: Create ButtonBuilder using Setters
+DESCRIPTION: Illustrates creating a ButtonBuilder by initializing with some data and then using setter methods to configure properties like emoji and custom ID. This approach allows for a more chained and readable configuration.
+
+SOURCE: https://discord.js.org/docs/packages/builders/1.11.2/ButtonBuilder%3AClass
+
+LANGUAGE: javascript
+CODE:
+```
+const button = new ButtonBuilder({
+	style: ButtonStyle.Secondary,
+	label: 'Click Me',
+})
+	.setEmoji({ name: '🙂' })
+	.setCustomId('another cool button');
+```
+
+----------------------------------------
+
+TITLE: Discord.js: Handle Client Ready Event (Deprecated)
+DESCRIPTION: Fires when the client has successfully connected to Discord and is ready to start processing data. Use ClientEvents instead.
+
+SOURCE: https://discord.js.org/docs/packages/discord.js/14.22.1/ClientEvents%3AInterface
+
+LANGUAGE: JavaScript
+CODE:
+```
+// Deprecated: Use ClientEvents instead
+client.on('ready', client => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
+```

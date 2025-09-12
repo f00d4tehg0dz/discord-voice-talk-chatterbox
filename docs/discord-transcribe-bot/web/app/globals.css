@@ -1,0 +1,125 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #76a2fa;
+  --secondary-foreground: #1f2937;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #1f2937;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #3b82f6;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #3b82f6;
+}
+
+@layer base {
+  * {
+    @apply border-[var(--border)];
+  }
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)];
+  }
+}
+
+/* Fix dropdown text color */
+select option {
+  color: var(--foreground);
+}
+
+/* Ensure dropdown text is visible */
+select {
+  color: var(--foreground);
+}
+
+select:focus {
+  color: var(--foreground);
+}
+
+/* Ensure dropdown options are visible */
+select option:checked {
+  color: var(--foreground);
+  background-color: var(--secondary);
+}
+
+/* Ensure dropdown options are visible on hover */
+select option:hover {
+  color: var(--foreground);
+  background-color: var(--accent);
+}
+
+/* Username color styles */
+.text-white\/90 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Override text-white/90 for username spans */
+/* .text-white\/90 span[style*="color:"] {
+  color: inherit !important;
+  opacity: 1 !important;
+} */
+
+/* Ensure username colors are not overridden by other styles */
+.prose strong {
+  color: inherit !important;
+}
+
+.prose em {
+  color: inherit !important;
+}
+
+/* Remove any color inheritance that might be interfering */
+.text-white\/90 {
+  color: rgba(255, 255, 255, 0.9)
+}
+
+/* Ensure spans with inline styles take precedence */
+span[style*="color:"] {
+  color: inherit
+}
+
+/* Override any text color inheritance for username spans */
+span[style*="color:"] {
+  color: var(--color)
+}
+
+/* Ensure username colors are visible in dark mode */
+.dark .text-white\/90 span[style*="color:"] {
+  color: inherit
+}
+
+/* Ensure username colors are visible in light mode */
+.light .text-white\/90 span[style*="color:"] {
+  color: inherit
+}
+
+
+/* Add a new rule to ensure username colors are always visible */
+.text-white\/90 span[style*="color:"] {
+  color: inherit;
+  opacity: 1;
+  mix-blend-mode: normal;
+}

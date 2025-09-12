@@ -1,0 +1,11 @@
+Senior Software Engineer & Technical Lead
+
+Hello! I'm Adrian Chrysanthou, a seasoned software engineer with a passion for building robust, scalable applications and leading technical teams. With over 8 years of experience in full-stack development, I've worked across various industries, from fintech to healthcare, always focusing on delivering high-quality solutions.
+
+My expertise lies in modern web technologies, with a particular focus on React, Node.js, and cloud architecture. I've led multiple teams in developing complex applications, always emphasizing clean code, best practices, and continuous improvement.
+
+What drives me is the intersection of technical excellence and team growth. I believe in creating an environment where developers can thrive, learn, and contribute their best work. Whether it's mentoring junior developers, architecting new systems, or solving complex technical challenges, I'm always up for the task.
+
+In my current role, I focus on building scalable applications and leading technical initiatives. I'm particularly interested in cloud architecture, microservices, and creating maintainable, well-documented codebases. I enjoy sharing knowledge and helping others grow in their careers.
+
+When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or sharing insights with the developer community. I believe in continuous learning and staying current with industry trends and best practices. 

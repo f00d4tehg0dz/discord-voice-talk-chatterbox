@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  discord-bot:
+    build: .
+    container_name: discord-transcribe-dnd
+    restart: unless-stopped
+    volumes:
+      - ./temp:/usr/src/app/temp
+      - ./logs:/usr/src/app/logs
+    environment:
+      - TOKEN=${TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge 

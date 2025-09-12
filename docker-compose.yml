@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  discord-bot:
+    build: .
+    container_name: discord-voice-bot
+    restart: unless-stopped
+    environment:
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CHATTERBOX_TTS_URL=http://chatterbox-tts:8001
+      - DEFAULT_CHARACTER=wizard
+      - VOICE_TIMEOUT=10000
+      - AUDIO_BUFFER_SIZE=4096
+    volumes:
+      - ./characters:/app/characters:ro
+      - ./config:/app/config:ro
+      - /tmp:/tmp
+    depends_on:
+      - chatterbox-tts
+    networks:
+      - bot-network
+
+  chatterbox-tts:
+    image: chatterbox-tts-server-chatterbox-tts-server:latest
+    container_name: chatterbox-tts-server
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./characters:/app/characters:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge
+
+volumes:
+  characters:
+  config:

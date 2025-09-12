@@ -1,0 +1,7 @@
+node_modules
+./history
+chatterbox-tts
+./chatterbox-tts
+/.history
+.env
+/vectordb
