@@ -19,15 +19,15 @@ export async function generateSpeech(text, voiceConfig = {}) {
         // Prepare request for Chatterbox TTS API format
         const chatterboxRequest = {
             text: text.trim(),
-            voice_mode: 'predefined',
-            predefined_voice_id: voiceConfig.voice_id || 'default',
+            voice_mode: 'clone',
+            reference_audio_filename: voiceConfig.voice_id || 'wizard.wav',
             output_format: 'wav',
             split_text: false,
-            temperature: voiceConfig.temperature,
-            exaggeration: voiceConfig.exaggeration,
-            cfg_weight: voiceConfig.cfg_weight,
+            temperature: voiceConfig.temperature || 0.8,
+            exaggeration: voiceConfig.exaggeration || 0.5,
+            cfg_weight: voiceConfig.cfg_weight || 0.5,
             speed_factor: voiceConfig.speed || 1.0,
-            seed: voiceConfig.seed
+            seed: voiceConfig.seed || -1
         };
         
         // Make request to Chatterbox TTS server
