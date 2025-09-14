@@ -166,7 +166,7 @@ function loadCharacterFile(characterName) {
 /**
  * Get character configuration (enhanced version)
  */
-function getCharacterConfig(characterName) {
+export function getCharacterConfig(characterName) {
     const name = characterName || config.bot.defaultCharacter;
     
     // First try to load from individual character file

@@ -1,9 +1,17 @@
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { config, validateConfig } from './src/utils/config.js';
 import { transcribeWithSpeaker } from './src/utils/transcription.js';
-import { generateResponse, addContextMessage } from './src/utils/chatgpt.js';
+import { generateResponse, addContextMessage, getCharacterConfig } from './src/utils/chatgpt.js';
 import { generateSpeechWithFallback, preprocessTextForTTS, checkTTSHealth } from './src/utils/tts.js';
 import { playAudio, activeConnections } from './src/utils/voiceConnection.js';
+import { 
+    generateImage, 
+    downloadImageBuffer, 
+    isImageRequest, 
+    extractImagePrompt, 
+    determineArtStyle, 
+    generateImageResponse 
+} from './src/utils/imageGeneration.js';
 import { readdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -178,6 +186,15 @@ process.on('audioData', async (audioEvent) => {
             const guildCharacter = getGuildCharacter(guildId);
             console.log(`[AUDIO] Guild character: ${guildCharacter}`);
             
+            // Check if user is requesting an image/sketch/drawing
+            const isImageReq = isImageRequest(transcription.text);
+            
+            if (isImageReq) {
+                console.log(`[IMAGE] User requested image generation: "${transcription.text}"`);
+                await handleImageRequest(transcription.text, guildCharacter, guildId, username, guild, userId);
+                return; // Handle image request separately - prevents normal conversation flow
+            }
+            
             const response = await generateResponse(
                 transcription.text,
                 guildCharacter, // Use guild's current character
@@ -262,6 +279,128 @@ process.on('audioData', async (audioEvent) => {
         console.error(`[AUDIO] Error processing audio data:`, error);
     }
 });
+
+/**
+ * Handle image generation requests
+ */
+async function handleImageRequest(text, characterName, guildId, username, guild, userId) {
+    try {
+        console.log(`[IMAGE] Handling image request from ${username}: "${text}"`);
+        
+        // Extract the image prompt from user message
+        const imagePrompt = extractImagePrompt(text);
+        const artStyle = determineArtStyle(text);
+        
+        console.log(`[IMAGE] Extracted prompt: "${imagePrompt}", Style: ${artStyle}`);
+        
+        // Send initial response with voice
+        const initialResponse = generateImageResponse(characterName, imagePrompt, false);
+        
+        // Send initial voice response if bot is connected to voice
+        if (activeConnections.has(guildId)) {
+            try {
+                const character = getCharacterConfig(characterName);
+                const processedText = preprocessTextForTTS(initialResponse);
+                const audioBuffer = await generateSpeechWithFallback(processedText, character.voice_config);
+                
+                if (audioBuffer) {
+                    await playAudio(guildId, audioBuffer);
+                    console.log(`[IMAGE] Played initial voice response for image request`);
+                }
+            } catch (ttsError) {
+                console.error(`[IMAGE] TTS/playback error for initial response:`, ttsError.message);
+            }
+        }
+        
+        try {
+            const channels = guild.channels.cache.filter(ch => ch.type === 0);
+            const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+            
+            if (textChannel) {
+                await textChannel.send(`🎨 **${characterName}:** ${initialResponse}`);
+            }
+        } catch (error) {
+            console.warn(`[IMAGE] Could not send initial response:`, error.message);
+        }
+        
+        // Generate the image
+        const imageResult = await generateImage(imagePrompt, artStyle, "standard");
+        
+        // Download image buffer for Discord
+        const imageBuffer = await downloadImageBuffer(imageResult.url);
+        
+        // Send success response with image and voice
+        const successResponse = generateImageResponse(characterName, imagePrompt, true);
+        
+        // Send success voice response if bot is connected to voice
+        if (activeConnections.has(guildId)) {
+            try {
+                const character = getCharacterConfig(characterName);
+                const processedText = preprocessTextForTTS(successResponse);
+                const audioBuffer = await generateSpeechWithFallback(processedText, character.voice_config);
+                
+                if (audioBuffer) {
+                    await playAudio(guildId, audioBuffer);
+                    console.log(`[IMAGE] Played success voice response for image completion`);
+                }
+            } catch (ttsError) {
+                console.error(`[IMAGE] TTS/playback error for success response:`, ttsError.message);
+            }
+        }
+        
+        try {
+            const channels = guild.channels.cache.filter(ch => ch.type === 0);
+            const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+            
+            if (textChannel) {
+                await textChannel.send({
+                    content: `🎨 **${characterName}:** ${successResponse}`,
+                    files: [{
+                        attachment: imageBuffer,
+                        name: `${characterName}_artwork_${Date.now()}.png`,
+                        description: `Generated artwork: ${imageResult.revisedPrompt || imagePrompt}`
+                    }]
+                });
+            }
+        } catch (error) {
+            console.error(`[IMAGE] Could not send image response:`, error.message);
+            // Try to send error response
+            try {
+                const channels = guild.channels.cache.filter(ch => ch.type === 0);
+                const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+                
+                if (textChannel) {
+                    const errorResponse = generateImageResponse(characterName, imagePrompt, false, error.message);
+                    await textChannel.send(`🎨 **${characterName}:** ${errorResponse}`);
+                }
+            } catch (fallbackError) {
+                console.error(`[IMAGE] Could not send error response:`, fallbackError.message);
+            }
+        }
+        
+        // Add image request and response to conversation context
+        addContextMessage(guildId, username, `Requested artwork: ${imagePrompt}`, characterName);
+        addContextMessage(guildId, characterName, successResponse, characterName);
+        
+        console.log(`[IMAGE] Successfully handled image request for ${username}`);
+        
+    } catch (error) {
+        console.error(`[IMAGE] Failed to handle image request:`, error);
+        
+        // Send error response
+        try {
+            const channels = guild.channels.cache.filter(ch => ch.type === 0);
+            const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+            
+            if (textChannel) {
+                const errorResponse = generateImageResponse(characterName, text, false, error.message);
+                await textChannel.send(`🎨 **${characterName}:** ${errorResponse}`);
+            }
+        } catch (responseError) {
+            console.error(`[IMAGE] Could not send error response:`, responseError.message);
+        }
+    }
+}
 
 /**
  * Determine if bot should respond to a message
