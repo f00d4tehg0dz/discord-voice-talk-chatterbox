@@ -29,6 +29,9 @@ export const config = {
     openai: {
         apiKey: process.env.OPENAI_API_KEY,
         model: 'gpt-4',
+        // Use GPT-4o-transcribe for improved transcription accuracy
+        transcriptionModel: process.env.OPENAI_TRANSCRIPTION_MODEL || 'gpt-4o-transcribe',
+        // Keep whisper-1 as fallback
         whisperModel: 'whisper-1',
     },
     
@@ -44,6 +47,16 @@ export const config = {
         voiceTimeout: parseInt(process.env.VOICE_TIMEOUT) || 10000,
         audioBufferSize: parseInt(process.env.AUDIO_BUFFER_SIZE) || 4096,
         maxResponseLength: parseInt(process.env.MAX_RESPONSE_LENGTH) || 800, // Increased for more natural responses - Chatterbox can handle much more
+    },
+
+    // Audio Filtering Configuration
+    audioFilter: {
+        silenceThreshold: parseFloat(process.env.AUDIO_SILENCE_THRESHOLD) || 0.01,
+        noiseThreshold: parseFloat(process.env.AUDIO_NOISE_THRESHOLD) || 0.05,
+        peakThreshold: parseFloat(process.env.AUDIO_PEAK_THRESHOLD) || 0.1,
+        minDurationMs: parseInt(process.env.AUDIO_MIN_DURATION_MS) || 170, // ~0.17 seconds
+        minConfidence: parseFloat(process.env.TRANSCRIPTION_MIN_CONFIDENCE) || 0.3,
+        singleWordConfidenceThreshold: parseFloat(process.env.SINGLE_WORD_CONFIDENCE_THRESHOLD) || 0.7,
     },
     
     // Character configurations

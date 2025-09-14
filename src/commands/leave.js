@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     try {
-        console.log(`[LEAVE] Command executed by ${interaction.user.username} in guild ${interaction.guildId}`);
+        console.log(`[LEAVE] Command executed by ${interaction.member?.displayName || interaction.user.username} in guild ${interaction.guildId}`);
         
         // Check if bot is connected to a voice channel
         const connection = activeConnections.get(interaction.guildId);

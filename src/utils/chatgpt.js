@@ -89,11 +89,20 @@ export async function generateResponse(message, characterName = null, guildId, u
                 ...context.messages.slice(-20) // Keep last 20 messages
             ];
         }
-        
+
+        // Add a temporary system message to remind the AI of the current user's name
+        const tempSystemMessage = {
+            role: 'system',
+            content: `The user you are currently responding to is named "${username}". When addressing or referring to them directly, use this name.`
+        };
+
+        // Create messages array for this specific response (includes temporary context)
+        const messagesForGeneration = [...context.messages, tempSystemMessage];
+
         // Generate response
         const completion = await openai.chat.completions.create({
             model: config.openai.model,
-            messages: context.messages,
+            messages: messagesForGeneration,
             max_tokens: 300, // Increased to allow for longer, more natural responses
             temperature: 0.7,
             frequency_penalty: 0.5,

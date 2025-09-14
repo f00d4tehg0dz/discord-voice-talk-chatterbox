@@ -1,9 +1,9 @@
-import { 
-    joinVoiceChannel, 
-    createAudioPlayer, 
+import {
+    joinVoiceChannel,
+    createAudioPlayer,
     createAudioResource,
-    entersState, 
-    VoiceConnectionStatus, 
+    entersState,
+    VoiceConnectionStatus,
     AudioPlayerStatus,
     getVoiceConnection
 } from '@discordjs/voice';
@@ -12,6 +12,7 @@ import { Readable } from 'stream';
 import prism from 'prism-media';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
+import { config } from './config.js';
 
 const pipelineAsync = promisify(pipeline);
 
@@ -208,31 +209,96 @@ export function startRecording(guildId, connection) {
 }
 
 /**
+ * Analyze audio buffer for silence and noise detection
+ */
+function analyzeAudioBuffer(audioBuffer) {
+    if (!audioBuffer || audioBuffer.length === 0) {
+        return { isSilence: true, volume: 0, reason: 'Empty buffer' };
+    }
+
+    // Calculate RMS (Root Mean Square) to measure audio level
+    let sum = 0;
+    let maxValue = 0;
+    const samples = audioBuffer.length / 2; // 16-bit audio = 2 bytes per sample
+
+    for (let i = 0; i < audioBuffer.length; i += 2) {
+        // Read 16-bit little-endian sample
+        const sample = audioBuffer.readInt16LE(i);
+        const absValue = Math.abs(sample);
+
+        sum += sample * sample;
+        maxValue = Math.max(maxValue, absValue);
+    }
+
+    const rms = Math.sqrt(sum / samples);
+    const volume = rms / 32768; // Normalize to 0-1 range (16-bit max = 32768)
+    const peakVolume = maxValue / 32768;
+
+    // Use configurable thresholds for silence detection
+    const SILENCE_THRESHOLD = config.audioFilter.silenceThreshold;
+    const NOISE_THRESHOLD = config.audioFilter.noiseThreshold;
+    const PEAK_THRESHOLD = config.audioFilter.peakThreshold;
+    const MIN_SAMPLES = (config.audioFilter.minDurationMs * 48000) / 1000; // Convert ms to samples
+
+    let isSilence = false;
+    let reason = '';
+
+    if (volume < SILENCE_THRESHOLD) {
+        isSilence = true;
+        reason = 'Audio level too low (silence)';
+    } else if (volume < NOISE_THRESHOLD && peakVolume < PEAK_THRESHOLD) {
+        isSilence = true;
+        reason = 'Audio level indicates background noise only';
+    } else if (samples < MIN_SAMPLES) {
+        isSilence = true;
+        reason = `Audio duration too short (${(samples / 48000).toFixed(2)}s < ${(MIN_SAMPLES / 48000).toFixed(2)}s)`;
+    }
+
+    return {
+        isSilence,
+        volume,
+        peakVolume,
+        duration: samples / 48000, // Convert to seconds (48kHz sample rate)
+        reason: reason || 'Contains meaningful audio'
+    };
+}
+
+/**
  * Process audio buffer for transcription
  */
 async function processAudioBuffer(guildId, userId, audioBuffer) {
     try {
         console.log(`[VOICE] Processing audio buffer for user ${userId} in guild ${guildId}, chunks: ${audioBuffer.length}`);
-        
+
         if (audioBuffer.length === 0) {
             console.log(`[VOICE] Empty audio buffer for user ${userId}, skipping`);
             return;
         }
-        
+
         // Combine audio chunks
         const audioData = Buffer.concat(audioBuffer);
         console.log(`[VOICE] Combined audio data size: ${audioData.length} bytes for user ${userId}`);
-        
+
+        // Analyze audio for silence/noise before transcription
+        const audioAnalysis = analyzeAudioBuffer(audioData);
+        console.log(`[VOICE] Audio analysis for user ${userId}: volume=${audioAnalysis.volume.toFixed(4)}, peak=${audioAnalysis.peakVolume.toFixed(4)}, duration=${audioAnalysis.duration.toFixed(2)}s, silence=${audioAnalysis.isSilence}, reason="${audioAnalysis.reason}"`);
+
+        if (audioAnalysis.isSilence) {
+            console.log(`[VOICE] Skipping transcription for user ${userId}: ${audioAnalysis.reason}`);
+            return; // Don't process silent/noise-only audio
+        }
+
         // Emit event for transcription processing
         // This will be handled by the transcription service
-        console.log(`[VOICE] Emitting audioData event for user ${userId}`);
+        console.log(`[VOICE] Emitting audioData event for user ${userId} (passed audio analysis)`);
         process.emit('audioData', {
             guildId,
             userId,
             audioData,
             timestamp: new Date(),
+            audioAnalysis, // Include analysis data for further filtering
         });
-        
+
     } catch (error) {
         console.error(`[VOICE] Failed to process audio buffer for user ${userId}:`, error);
     }

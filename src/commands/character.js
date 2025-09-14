@@ -55,7 +55,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     try {
         const subcommand = interaction.options.getSubcommand();
-        console.log(`[CHARACTER] ${subcommand} subcommand executed by ${interaction.user.username} in guild ${interaction.guildId}`);
+        console.log(`[CHARACTER] ${subcommand} subcommand executed by ${interaction.member?.displayName || interaction.user.username} in guild ${interaction.guildId}`);
         
         switch (subcommand) {
             case 'set':

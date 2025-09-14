@@ -5,7 +5,7 @@ A Discord voice bot that captures audio from voice channels in real-time, transc
 ## Features
 
 - 🎤 **Real-time Voice Capture**: Listens to users speaking in Discord voice channels
-- 🗣️ **Speech-to-Text**: Transcribes audio using OpenAI Whisper API
+- 🗣️ **Speech-to-Text**: Transcribes audio using OpenAI GPT-4o-transcribe (with Whisper fallback)
 - 🤖 **AI Responses**: Generates contextual responses using ChatGPT with character personalities  
 - 🎭 **Multiple Characters**: Supports multiple AI characters with unique voices and personalities
 - 🔊 **Text-to-Speech**: Converts responses to speech using Chatterbox TTS
@@ -46,6 +46,17 @@ DISCORD_CLIENT_ID=your_discord_client_id_here
 OPENAI_API_KEY=your_openai_api_key_here
 CHATTERBOX_TTS_URL=http://localhost:8001
 DEFAULT_CHARACTER=wizard
+
+# Optional: Transcription model configuration
+OPENAI_TRANSCRIPTION_MODEL=gpt-4o-transcribe  # or gpt-4o-mini-transcribe for faster/cheaper transcription
+
+# Optional: Audio filtering thresholds (prevents responding to empty noise)
+AUDIO_SILENCE_THRESHOLD=0.01        # Very low audio level threshold
+AUDIO_NOISE_THRESHOLD=0.05          # Minimum meaningful speech level
+AUDIO_PEAK_THRESHOLD=0.1            # Minimum peak volume for speech
+AUDIO_MIN_DURATION_MS=170           # Minimum audio duration (milliseconds)
+TRANSCRIPTION_MIN_CONFIDENCE=0.3    # Minimum transcription confidence
+SINGLE_WORD_CONFIDENCE_THRESHOLD=0.7 # Higher confidence required for single words
 ```
 
 ### 3. Start Services

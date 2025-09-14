@@ -1,16 +1,22 @@
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { config, validateConfig } from './src/utils/config.js';
-import { transcribeWithSpeaker } from './src/utils/transcription.js';
+import { transcribeWithSpeaker, testGpt4oTranscribe, getTranscriptionStats } from './src/utils/transcription.js';
 import { generateResponse, addContextMessage, getCharacterConfig } from './src/utils/chatgpt.js';
 import { generateSpeechWithFallback, preprocessTextForTTS, checkTTSHealth } from './src/utils/tts.js';
 import { playAudio, activeConnections } from './src/utils/voiceConnection.js';
-import { 
-    generateImage, 
-    downloadImageBuffer, 
-    isImageRequest, 
-    extractImagePrompt, 
-    determineArtStyle, 
-    generateImageResponse 
+import {
+    generateImage,
+    downloadImageBuffer,
+    isImageRequest,
+    isRedrawRequest,
+    isShowPreviousSketchRequest,
+    extractImagePrompt,
+    determineArtStyle,
+    generateImageResponse,
+    storeRecentSketch,
+    getLastSketch,
+    findSketchByContent,
+    generateShowSketchResponse
 } from './src/utils/imageGeneration.js';
 import { readdir } from 'fs/promises';
 import { join, dirname } from 'path';
@@ -88,7 +94,19 @@ client.once('ready', async () => {
     } else {
         console.warn('⚠️ Chatterbox TTS server is not responding - TTS features may not work');
     }
-    
+
+    // Test GPT-4o-transcribe availability
+    const transcriptionTest = await testGpt4oTranscribe();
+    if (transcriptionTest.available) {
+        console.log('✅ GPT-4o-transcribe is available and ready');
+    } else {
+        console.warn(`⚠️ ${transcriptionTest.message}`);
+    }
+
+    // Log transcription stats
+    const stats = getTranscriptionStats();
+    console.log(`📊 Transcription: Primary model: ${stats.primaryModel}, Fallback: ${stats.fallbackModel}`);
+
     console.log('🚀 Bot is fully ready and operational!');
 });
 
@@ -105,7 +123,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     
     try {
-        console.log(`[COMMAND] ${interaction.commandName} executed by ${interaction.user.username} in ${interaction.guild?.name || 'DM'}`);
+        console.log(`[COMMAND] ${interaction.commandName} executed by ${interaction.member?.displayName || interaction.user.username} in ${interaction.guild?.name || 'DM'}`);
         await command.execute(interaction);
         
     } catch (error) {
@@ -138,11 +156,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (newState.member.user.bot) return; // Ignore bot state changes
     
     if (!oldState.channel && newState.channel) {
-        console.log(`[VOICE] ${newState.member.user.username} joined ${newState.channel.name} in ${guild.name}`);
+        console.log(`[VOICE] ${newState.member.displayName} joined ${newState.channel.name} in ${guild.name}`);
     } else if (oldState.channel && !newState.channel) {
-        console.log(`[VOICE] ${oldState.member.user.username} left ${oldState.channel.name} in ${guild.name}`);
+        console.log(`[VOICE] ${oldState.member.displayName} left ${oldState.channel.name} in ${guild.name}`);
     } else if (oldState.channel && newState.channel && oldState.channel.id !== newState.channel.id) {
-        console.log(`[VOICE] ${newState.member.user.username} moved from ${oldState.channel.name} to ${newState.channel.name} in ${guild.name}`);
+        console.log(`[VOICE] ${newState.member.displayName} moved from ${oldState.channel.name} to ${newState.channel.name} in ${guild.name}`);
     }
 });
 
@@ -151,7 +169,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
  */
 process.on('audioData', async (audioEvent) => {
     try {
-        const { guildId, userId, audioData, timestamp } = audioEvent;
+        const { guildId, userId, audioData, timestamp, audioAnalysis } = audioEvent;
         
         console.log(`[AUDIO] Processing audio from user ${userId} in guild ${guildId}`);
         
@@ -161,12 +179,13 @@ process.on('audioData', async (audioEvent) => {
             console.warn(`[AUDIO] Guild ${guildId} not found`);
             return;
         }
+
+        // Get guild member to access display name/nickname
+        const member = await guild.members.fetch(userId).catch(() => null);
+        const username = member?.displayName || member?.user?.username || `User_${userId.slice(-4)}`;
         
-        const user = await client.users.fetch(userId).catch(() => null);
-        const username = user?.username || `User_${userId.slice(-4)}`;
-        
-        // Transcribe the audio
-        const transcription = await transcribeWithSpeaker(audioData, userId, username);
+        // Transcribe the audio with audio analysis for enhanced filtering
+        const transcription = await transcribeWithSpeaker(audioData, userId, username, audioAnalysis);
         
         if (!transcription || !transcription.text) {
             console.log(`[AUDIO] No transcription result for user ${username}`);
@@ -187,11 +206,13 @@ process.on('audioData', async (audioEvent) => {
             console.log(`[AUDIO] Guild character: ${guildCharacter}`);
             
             // Check if user is requesting an image/sketch/drawing
-            const isImageReq = isImageRequest(transcription.text);
-            
-            if (isImageReq) {
-                console.log(`[IMAGE] User requested image generation: "${transcription.text}"`);
-                await handleImageRequest(transcription.text, guildCharacter, guildId, username, guild, userId);
+            const isImageReq = isImageRequest(transcription.text, guildId);
+            const isRedraw = isRedrawRequest(transcription.text, guildId);
+            const isShowPrevious = isShowPreviousSketchRequest(transcription.text, guildId);
+
+            if (isImageReq || isRedraw || isShowPrevious) {
+                console.log(`[IMAGE] User requested - Image: ${isImageReq}, Redraw: ${isRedraw}, Show Previous: ${isShowPrevious}`);
+                await handleImageRequest(transcription.text, guildCharacter, guildId, username, guild, userId, { isRedraw, isShowPrevious });
                 return; // Handle image request separately - prevents normal conversation flow
             }
             
@@ -283,18 +304,86 @@ process.on('audioData', async (audioEvent) => {
 /**
  * Handle image generation requests
  */
-async function handleImageRequest(text, characterName, guildId, username, guild, userId) {
+async function handleImageRequest(text, characterName, guildId, username, guild, userId, options = {}) {
     try {
         console.log(`[IMAGE] Handling image request from ${username}: "${text}"`);
-        
+        const { isRedraw, isShowPrevious } = options;
+
+        // Handle showing previous sketch
+        if (isShowPrevious) {
+            console.log(`[IMAGE] User requested to show previous sketch`);
+
+            const previousSketch = findSketchByContent(guildId, text) || getLastSketch(guildId);
+            if (previousSketch) {
+                const showResponse = generateShowSketchResponse(characterName, previousSketch);
+
+                // Send voice response if connected
+                if (activeConnections.has(guildId)) {
+                    try {
+                        const character = getCharacterConfig(characterName);
+                        const processedText = preprocessTextForTTS(showResponse);
+                        const audioBuffer = await generateSpeechWithFallback(processedText, character.voice_config);
+
+                        if (audioBuffer) {
+                            await playAudio(guildId, audioBuffer);
+                            console.log(`[IMAGE] Played voice response for showing previous sketch`);
+                        }
+                    } catch (ttsError) {
+                        console.error(`[IMAGE] TTS/playback error for show previous:`, ttsError.message);
+                    }
+                }
+
+                // Send the previous sketch
+                try {
+                    const channels = guild.channels.cache.filter(ch => ch.type === 0);
+                    const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+
+                    if (textChannel && previousSketch.url) {
+                        const imageBuffer = await downloadImageBuffer(previousSketch.url);
+                        await textChannel.send({
+                            content: `🎨 **${characterName}:** ${showResponse}`,
+                            files: [{
+                                attachment: imageBuffer,
+                                name: `${characterName}_previous_artwork_${Date.now()}.png`,
+                                description: `Previous artwork: ${previousSketch.originalPrompt || previousSketch.prompt}`
+                            }]
+                        });
+                        console.log(`[IMAGE] Successfully showed previous sketch to ${username}`);
+                    }
+                } catch (error) {
+                    console.error(`[IMAGE] Could not show previous sketch:`, error.message);
+                }
+                return;
+            } else {
+                // No previous sketch found
+                const noSketchResponse = characterName.toLowerCase() === 'emma' ?
+                    "Hmm, I can't remember making any sketches recently! Maybe ask me to draw something new?" :
+                    "I have not conjured any visions recently. Perhaps request a new mystical creation?";
+
+                try {
+                    const channels = guild.channels.cache.filter(ch => ch.type === 0);
+                    const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+
+                    if (textChannel) {
+                        await textChannel.send(`🎨 **${characterName}:** ${noSketchResponse}`);
+                    }
+                } catch (error) {
+                    console.error(`[IMAGE] Could not send no sketch response:`, error.message);
+                }
+                return;
+            }
+        }
+
         // Extract the image prompt from user message
-        const imagePrompt = extractImagePrompt(text);
+        const imagePrompt = isRedraw ?
+            (getLastSketch(guildId)?.originalPrompt || extractImagePrompt(text)) :
+            extractImagePrompt(text);
         const artStyle = determineArtStyle(text);
-        
-        console.log(`[IMAGE] Extracted prompt: "${imagePrompt}", Style: ${artStyle}`);
-        
+
+        console.log(`[IMAGE] Extracted prompt: "${imagePrompt}", Style: ${artStyle}, IsRedraw: ${isRedraw}`);
+
         // Send initial response with voice
-        const initialResponse = generateImageResponse(characterName, imagePrompt, false);
+        const initialResponse = generateImageResponse(characterName, imagePrompt, false, null, artStyle, isRedraw);
         
         // Send initial voice response if bot is connected to voice
         if (activeConnections.has(guildId)) {
@@ -329,16 +418,19 @@ async function handleImageRequest(text, characterName, guildId, username, guild,
         // Download image buffer for Discord
         const imageBuffer = await downloadImageBuffer(imageResult.url);
         
+        // Store the generated sketch
+        storeRecentSketch(guildId, imageResult, userId);
+
         // Send success response with image and voice
-        const successResponse = generateImageResponse(characterName, imagePrompt, true);
-        
+        const successResponse = generateImageResponse(characterName, imagePrompt, true, null, artStyle, isRedraw);
+
         // Send success voice response if bot is connected to voice
         if (activeConnections.has(guildId)) {
             try {
                 const character = getCharacterConfig(characterName);
                 const processedText = preprocessTextForTTS(successResponse);
                 const audioBuffer = await generateSpeechWithFallback(processedText, character.voice_config);
-                
+
                 if (audioBuffer) {
                     await playAudio(guildId, audioBuffer);
                     console.log(`[IMAGE] Played success voice response for image completion`);
@@ -347,11 +439,11 @@ async function handleImageRequest(text, characterName, guildId, username, guild,
                 console.error(`[IMAGE] TTS/playback error for success response:`, ttsError.message);
             }
         }
-        
+
         try {
             const channels = guild.channels.cache.filter(ch => ch.type === 0);
             const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
-            
+
             if (textChannel) {
                 await textChannel.send({
                     content: `🎨 **${characterName}:** ${successResponse}`,
@@ -368,9 +460,9 @@ async function handleImageRequest(text, characterName, guildId, username, guild,
             try {
                 const channels = guild.channels.cache.filter(ch => ch.type === 0);
                 const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
-                
+
                 if (textChannel) {
-                    const errorResponse = generateImageResponse(characterName, imagePrompt, false, error.message);
+                    const errorResponse = generateImageResponse(characterName, imagePrompt, false, error.message, artStyle, isRedraw);
                     await textChannel.send(`🎨 **${characterName}:** ${errorResponse}`);
                 }
             } catch (fallbackError) {
@@ -391,9 +483,10 @@ async function handleImageRequest(text, characterName, guildId, username, guild,
         try {
             const channels = guild.channels.cache.filter(ch => ch.type === 0);
             const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
-            
+
             if (textChannel) {
-                const errorResponse = generateImageResponse(characterName, text, false, error.message);
+                const artStyle = determineArtStyle(text);
+                const errorResponse = generateImageResponse(characterName, text, false, error.message, artStyle, options.isRedraw);
                 await textChannel.send(`🎨 **${characterName}:** ${errorResponse}`);
             }
         } catch (responseError) {

@@ -24,7 +24,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     try {
-        console.log(`[JOIN] Command executed by ${interaction.user.username} in guild ${interaction.guildId}`);
+        console.log(`[JOIN] Command executed by ${interaction.member?.displayName || interaction.user.username} in guild ${interaction.guildId}`);
         
         await interaction.deferReply();
         
