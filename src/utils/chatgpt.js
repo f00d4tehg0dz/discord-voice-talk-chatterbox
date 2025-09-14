@@ -1,5 +1,14 @@
 import OpenAI from 'openai';
 import { config } from './config.js';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Cache for loaded character files
+const characterCache = new Map();
 
 const openai = new OpenAI({
     apiKey: config.openai.apiKey,
@@ -7,6 +16,9 @@ const openai = new OpenAI({
 
 // Store conversation context per guild/user
 const conversationContext = new Map();
+
+// Store guild character selections
+const guildCharacters = new Map();
 
 /**
  * Generate response using ChatGPT with character personality
@@ -28,15 +40,34 @@ export async function generateResponse(message, characterName = null, guildId, u
         let context = conversationContext.get(contextKey);
         
         if (!context) {
+            // Build enhanced system prompt with character details
+            let systemPrompt = character.system_prompt;
+            
+            // Add personality traits if available
+            if (character.personality_traits && character.personality_traits.length > 0) {
+                systemPrompt += ` Your personality traits include: ${character.personality_traits.join(', ')}.`;
+            }
+            
+            // Add interests if available
+            if (character.interests && character.interests.length > 0) {
+                systemPrompt += ` Your interests include: ${character.interests.join(', ')}.`;
+            }
+            
+            // Add speech patterns if available
+            if (character.speech_patterns && character.speech_patterns.length > 0) {
+                systemPrompt += ` Your speech patterns: ${character.speech_patterns.join(', ')}.`;
+            }
+            
             context = {
                 messages: [
                     {
                         role: 'system',
-                        content: character.system_prompt
+                        content: systemPrompt
                     }
                 ],
                 lastActivity: new Date(),
                 participants: new Set(),
+                character: character, // Store full character data
             };
             conversationContext.set(contextKey, context);
         }
@@ -63,7 +94,7 @@ export async function generateResponse(message, characterName = null, guildId, u
         const completion = await openai.chat.completions.create({
             model: config.openai.model,
             messages: context.messages,
-            max_tokens: 200,
+            max_tokens: 300, // Increased to allow for longer, more natural responses
             temperature: 0.7,
             frequency_penalty: 0.5,
             presence_penalty: 0.3,
@@ -106,15 +137,49 @@ export async function generateResponse(message, characterName = null, guildId, u
 }
 
 /**
- * Get character configuration
+ * Load character from individual character file
+ */
+function loadCharacterFile(characterName) {
+    if (characterCache.has(characterName)) {
+        return characterCache.get(characterName);
+    }
+    
+    try {
+        const charactersDir = join(__dirname, '..', '..', 'characters');
+        const characterFile = join(charactersDir, characterName, `${characterName}.json`);
+        
+        console.log(`[CHATGPT] Loading character file: ${characterFile}`);
+        const characterData = JSON.parse(readFileSync(characterFile, 'utf8'));
+        
+        // Cache the loaded character
+        characterCache.set(characterName, characterData);
+        
+        console.log(`[CHATGPT] Loaded enhanced character data for ${characterName}`);
+        return characterData;
+        
+    } catch (error) {
+        console.warn(`[CHATGPT] Failed to load character file for ${characterName}:`, error.message);
+        return null;
+    }
+}
+
+/**
+ * Get character configuration (enhanced version)
  */
 function getCharacterConfig(characterName) {
     const name = characterName || config.bot.defaultCharacter;
-    const character = config.characters[name];
+    
+    // First try to load from individual character file
+    let character = loadCharacterFile(name);
+    
+    // Fallback to config.characters
+    if (!character) {
+        character = config.characters[name];
+    }
     
     if (!character) {
         console.warn(`[CHATGPT] Character "${name}" not found, using default`);
-        return config.characters[config.bot.defaultCharacter];
+        character = loadCharacterFile(config.bot.defaultCharacter) || config.characters[config.bot.defaultCharacter];
     }
     
     return character;
@@ -127,6 +192,9 @@ export function setGuildCharacter(guildId, characterName) {
     if (!config.characters[characterName]) {
         throw new Error(`Character "${characterName}" not found`);
     }
+    
+    // Store guild character selection
+    guildCharacters.set(guildId, characterName);
     
     // Clear existing context to switch characters
     const oldContextKey = findContextKeyForGuild(guildId);
@@ -142,11 +210,18 @@ export function setGuildCharacter(guildId, characterName) {
  * Get current character for a guild
  */
 export function getGuildCharacter(guildId) {
+    // First check if we have a stored guild character selection
+    if (guildCharacters.has(guildId)) {
+        return guildCharacters.get(guildId);
+    }
+    
+    // Fallback to context-based lookup (for backwards compatibility)
     const contextKey = findContextKeyForGuild(guildId);
     if (contextKey) {
         const characterName = contextKey.split('_').slice(1).join('_'); // Remove guildId prefix
         return characterName;
     }
+    
     return config.bot.defaultCharacter;
 }
 

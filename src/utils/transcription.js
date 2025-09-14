@@ -62,10 +62,7 @@ export async function transcribeAudio(audioBuffer, userId) {
             // Transcribe using OpenAI Whisper
             const { createReadStream } = await import('fs');
             const transcription = await openai.audio.transcriptions.create({
-                file: {
-                    name: `audio_${userId}.wav`,
-                    data: createReadStream(wavPath),
-                },
+                file: createReadStream(wavPath),
                 model: config.openai.whisperModel,
                 language: 'en', // Can be made configurable
                 prompt: 'This is a conversation in a Discord voice channel.',

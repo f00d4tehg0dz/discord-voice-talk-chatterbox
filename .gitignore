@@ -5,3 +5,5 @@ chatterbox-tts
 /.history
 .env
 /vectordb
+/onnx-env310
+/venv

@@ -174,9 +174,13 @@ process.on('audioData', async (audioEvent) => {
             console.log(`[AUDIO] Bot will respond to ${username}'s message`);
             
             // Generate response using ChatGPT
+            const { getGuildCharacter } = await import('./src/utils/chatgpt.js');
+            const guildCharacter = getGuildCharacter(guildId);
+            console.log(`[AUDIO] Guild character: ${guildCharacter}`);
+            
             const response = await generateResponse(
                 transcription.text,
-                null, // Use default character for guild
+                guildCharacter, // Use guild's current character
                 guildId,
                 userId,
                 username
@@ -185,32 +189,66 @@ process.on('audioData', async (audioEvent) => {
             if (response && response.text) {
                 console.log(`[AUDIO] Generated response: \"${response.text}\"`);
                 
-                // Send text response to channel (if bot has access)
-                try {
-                    const channels = guild.channels.cache.filter(ch => ch.type === 0); // TEXT channels
-                    const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
-                    
-                    if (textChannel) {
-                        await textChannel.send(`💬 **${response.character}:** ${response.text}`);
-                    }
-                } catch (error) {
-                    console.warn(`[AUDIO] Could not send text response:`, error.message);
-                }
-                
-                // Generate and play speech if bot is connected to voice
+                // Generate and play speech first if bot is connected to voice
                 if (activeConnections.has(guildId)) {
                     try {
                         const processedText = preprocessTextForTTS(response.text);
                         const audioBuffer = await generateSpeechWithFallback(processedText, response.voiceConfig);
                         
                         if (audioBuffer) {
+                            // Send text response to channel right before audio starts playing
+                            try {
+                                const channels = guild.channels.cache.filter(ch => ch.type === 0); // TEXT channels
+                                const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+                                
+                                if (textChannel) {
+                                    await textChannel.send(`💬 **${response.character}:** ${response.text}`);
+                                }
+                            } catch (error) {
+                                console.warn(`[AUDIO] Could not send text response:`, error.message);
+                            }
+                            
                             await playAudio(guildId, audioBuffer);
                             console.log(`[AUDIO] Played voice response in guild ${guildId}`);
                         } else {
-                            console.warn(`[AUDIO] TTS failed, sent text-only response`);
+                            console.warn(`[AUDIO] TTS failed, sending text-only response`);
+                            // Fallback to text-only response if TTS fails
+                            try {
+                                const channels = guild.channels.cache.filter(ch => ch.type === 0);
+                                const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+                                
+                                if (textChannel) {
+                                    await textChannel.send(`💬 **${response.character}:** ${response.text}`);
+                                }
+                            } catch (error) {
+                                console.warn(`[AUDIO] Could not send fallback text response:`, error.message);
+                            }
                         }
                     } catch (ttsError) {
                         console.error(`[AUDIO] TTS/playback error:`, ttsError.message);
+                        // Fallback to text-only response on TTS error
+                        try {
+                            const channels = guild.channels.cache.filter(ch => ch.type === 0);
+                            const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+                            
+                            if (textChannel) {
+                                await textChannel.send(`💬 **${response.character}:** ${response.text}`);
+                            }
+                        } catch (error) {
+                            console.warn(`[AUDIO] Could not send fallback text response:`, error.message);
+                        }
+                    }
+                } else {
+                    // Bot not in voice channel, send text response only
+                    try {
+                        const channels = guild.channels.cache.filter(ch => ch.type === 0);
+                        const textChannel = channels.find(ch => ch.name.includes('general') || ch.name.includes('chat')) || channels.first();
+                        
+                        if (textChannel) {
+                            await textChannel.send(`💬 **${response.character}:** ${response.text}`);
+                        }
+                    } catch (error) {
+                        console.warn(`[AUDIO] Could not send text response:`, error.message);
                     }
                 }
             }

@@ -43,7 +43,7 @@ export const config = {
         defaultCharacter: process.env.DEFAULT_CHARACTER || 'wizard',
         voiceTimeout: parseInt(process.env.VOICE_TIMEOUT) || 10000,
         audioBufferSize: parseInt(process.env.AUDIO_BUFFER_SIZE) || 4096,
-        maxResponseLength: 200,
+        maxResponseLength: parseInt(process.env.MAX_RESPONSE_LENGTH) || 800, // Increased for more natural responses - Chatterbox can handle much more
     },
     
     // Character configurations

@@ -8,6 +8,7 @@ import {
     getVoiceConnection
 } from '@discordjs/voice';
 import { createWriteStream } from 'fs';
+import { Readable } from 'stream';
 import prism from 'prism-media';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
@@ -121,9 +122,11 @@ export function startRecording(guildId, connection) {
             const audioStream = receiver.subscribe(userId, {
                 end: {
                     behavior: 'afterSilence',
-                    duration: 1000, // 1 second of silence before ending
+                    duration: 500, // 0.5 seconds of silence before ending
                 },
             });
+            
+            console.log(`[VOICE] Created audio stream for user ${userId}`);
             
             // Set up audio processing pipeline
             const decoder = new prism.opus.Decoder({
@@ -139,15 +142,19 @@ export function startRecording(guildId, connection) {
             // Process audio data
             decoder.on('data', (chunk) => {
                 audioBuffer.push(chunk);
+                console.log(`[VOICE] Received audio chunk from user ${userId}, size: ${chunk.length}, total chunks: ${audioBuffer.length}`);
             });
             
             decoder.on('end', () => {
-                console.log(`[VOICE] Audio stream ended for user ${userId} in guild ${guildId}`);
+                console.log(`[VOICE] Audio stream ended for user ${userId} in guild ${guildId}, buffer chunks: ${audioBuffer.length}`);
                 recorder.userStreams.delete(userId);
                 
                 // Process the complete audio buffer
                 if (audioBuffer.length > 0) {
+                    console.log(`[VOICE] Processing ${audioBuffer.length} audio chunks for user ${userId}`);
                     processAudioBuffer(guildId, userId, audioBuffer);
+                } else {
+                    console.log(`[VOICE] No audio data to process for user ${userId}`);
                 }
             });
             
@@ -156,12 +163,39 @@ export function startRecording(guildId, connection) {
                 recorder.userStreams.delete(userId);
             });
             
+            // Add audio stream event listeners
+            audioStream.on('data', (chunk) => {
+                console.log(`[VOICE] Raw audio data from user ${userId}, size: ${chunk.length}`);
+            });
+            
+            audioStream.on('end', () => {
+                console.log(`[VOICE] Audio stream ended for user ${userId}`);
+            });
+            
+            audioStream.on('error', (error) => {
+                console.error(`[VOICE] Audio stream error for user ${userId}:`, error);
+            });
+            
             // Pipe audio stream through decoder
             audioStream.pipe(decoder);
         });
         
         receiver.speaking.on('end', (userId) => {
             console.log(`[VOICE] User ${userId} stopped speaking in guild ${guildId}`);
+            
+            // Process audio when user stops speaking - use a timeout to allow for final audio chunks
+            setTimeout(() => {
+                const userStream = recorder.userStreams.get(userId);
+                if (userStream && userStream.audioBuffer.length > 0) {
+                    console.log(`[VOICE] Processing ${userStream.audioBuffer.length} audio chunks for user ${userId} (speaking ended)`);
+                    // Create a copy of the buffer before processing to avoid race conditions
+                    const bufferCopy = [...userStream.audioBuffer];
+                    processAudioBuffer(guildId, userId, bufferCopy);
+                    
+                    // Clear the original buffer after processing
+                    userStream.audioBuffer.length = 0;
+                }
+            }, 100); // Small delay to ensure all audio chunks are captured
         });
         
         activeRecorders.set(guildId, recorder);
@@ -180,13 +214,18 @@ async function processAudioBuffer(guildId, userId, audioBuffer) {
     try {
         console.log(`[VOICE] Processing audio buffer for user ${userId} in guild ${guildId}, chunks: ${audioBuffer.length}`);
         
-        if (audioBuffer.length === 0) return;
+        if (audioBuffer.length === 0) {
+            console.log(`[VOICE] Empty audio buffer for user ${userId}, skipping`);
+            return;
+        }
         
         // Combine audio chunks
         const audioData = Buffer.concat(audioBuffer);
+        console.log(`[VOICE] Combined audio data size: ${audioData.length} bytes for user ${userId}`);
         
         // Emit event for transcription processing
         // This will be handled by the transcription service
+        console.log(`[VOICE] Emitting audioData event for user ${userId}`);
         process.emit('audioData', {
             guildId,
             userId,
@@ -211,7 +250,10 @@ export async function playAudio(guildId, audioBuffer) {
         
         console.log(`[VOICE] Playing audio in guild ${guildId}, size: ${audioBuffer.length} bytes`);
         
-        const resource = createAudioResource(audioBuffer, {
+        // Convert buffer to readable stream
+        const audioStream = Readable.from(audioBuffer);
+        
+        const resource = createAudioResource(audioStream, {
             inputType: 'arbitrary',
         });
         

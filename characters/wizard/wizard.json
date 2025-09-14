@@ -6,8 +6,8 @@
     "voice_config": {
         "voice_id": "wizard.wav",
         "speed": 0.9,
-        "temperature": 0.8,
-        "exaggeration": 0.6,
+        "temperature": 0.65,
+        "exaggeration": 0.35,
         "cfg_weight": 0.5
     }
 } 
