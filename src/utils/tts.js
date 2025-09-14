@@ -20,7 +20,7 @@ export async function generateSpeech(text, voiceConfig = {}) {
         const chatterboxRequest = {
             text: text.trim(),
             voice_mode: 'clone',
-            reference_audio_filename: voiceConfig.voice_id || 'wizard.wav',
+            reference_audio_filename: voiceConfig.voice_id || 'emmastone.wav',
             output_format: 'wav',
             split_text: false,
             temperature: voiceConfig.temperature || 0.8,
