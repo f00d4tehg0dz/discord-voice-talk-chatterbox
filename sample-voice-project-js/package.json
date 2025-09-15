@@ -1,0 +1,39 @@
+{
+  "name": "discord-voice-talk-chatterbox",
+  "version": "1.0.0",
+  "description": "Discord voice bot with real-time transcription, ChatGPT responses, and Chatterbox TTS",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "deploy-commands": "node deploy-commands.js"
+  },
+  "dependencies": {
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/voice": "^0.17.0",
+    "axios": "^1.7.7",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "fluent-ffmpeg": "^2.1.3",
+    "libsodium-wrappers": "^0.7.15",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.57.0",
+    "prism-media": "^1.3.5"
+  },
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.24"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "voice",
+    "tts",
+    "chatgpt",
+    "transcription",
+    "chatterbox"
+  ]
+}

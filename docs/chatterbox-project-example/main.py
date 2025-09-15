@@ -146,7 +146,7 @@ VOICE_CONFIGS = {
         "emma": {
             "voice_path": "characters/emma/emmastone.wav",
             "style": "casual",
-            "exaggeration": 0.475,
+            "exaggeration": 0.675,
             "cfg_weight": 0.35
         },
         "wizard": {
@@ -158,7 +158,7 @@ VOICE_CONFIGS = {
         "oddly": {
             "voice_path": "characters/oddly/oddly.wav",
             "style": "formal",
-            "exaggeration": 0.475,
+            "exaggeration": 0.675,
             "cfg_weight": 0.35
         },
         "adrian": {
