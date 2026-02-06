@@ -4,13 +4,13 @@ A Discord voice bot that captures audio from voice channels in real-time, transc
 
 ## Features
 
-- 🎤 **Real-time Voice Capture**: Listens to users speaking in Discord voice channels
-- 🗣️ **Speech-to-Text**: Transcribes audio using OpenAI GPT-4o-transcribe (with Whisper fallback)
-- 🤖 **AI Responses**: Generates contextual responses using ChatGPT with character personalities  
-- 🎭 **Multiple Characters**: Supports multiple AI characters with unique voices and personalities
-- 🔊 **Text-to-Speech**: Converts responses to speech using Chatterbox TTS
-- 💬 **Context Awareness**: Maintains conversation context across interactions
-- ⚡ **Slash Commands**: Easy-to-use Discord slash commands
+- **Real-time Voice Capture**: Listens to users speaking in Discord voice channels
+-  **Speech-to-Text**: Transcribes audio using OpenAI GPT-4o-transcribe (with Whisper fallback)
+-  **AI Responses**: Generates contextual responses using ChatGPT with character personalities  
+-  **Multiple Characters**: Supports multiple AI characters with unique voices and personalities
+- **Text-to-Speech**: Converts responses to speech using Chatterbox TTS
+- **Context Awareness**: Maintains conversation context across interactions
+-  **Slash Commands**: Easy-to-use Discord slash commands
 
 ## Prerequisites
 
@@ -233,9 +233,6 @@ docker-compose logs -f
 4. Test thoroughly
 5. Submit a pull request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
