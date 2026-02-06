@@ -494,10 +494,6 @@ Automatic cleanup runs daily:
 - **Discussions:** [GitHub Discussions](https://github.com/yourusername/DiscordTranscribeDnD/discussions)
 - **Documentation:** [Wiki](https://github.com/yourusername/DiscordTranscribeDnD/wiki)
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - **OpenAI** for the Whisper API
